@@ -1,0 +1,169 @@
+
+Last login: Mon Aug 18 12:16:15 on ttys000
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+MacBooks-MacBook-Air:~ macbook$ cd desktop
+MacBooks-MacBook-Air:desktop macbook$ cd royal-tech
+MacBooks-MacBook-Air:royal-tech macbook$ cd frontend
+MacBooks-MacBook-Air:frontend macbook$ ng s
+Initial chunk files | Names         | Raw size
+main.js             | main          | 47.75 kB | 
+polyfills.js        | polyfills     | 95 bytes | 
+styles.css          | styles        | 95 bytes | 
+
+                    | Initial total | 47.94 kB
+
+Application bundle generation complete. [3.602 seconds]
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request 
+transformations.
+  ➜  Local:   http://localhost:4200/
+  ➜  press h + enter to show help
+^C
+MacBooks-MacBook-Air:frontend macbook$ code .
+MacBooks-MacBook-Air:frontend macbook$ echo "node_modules/
+> dist/
+> .angular/cache
+> frontend/node_modules
+> frontend/dist" >> .gitignore
+MacBooks-MacBook-Air:frontend macbook$ 
+MacBooks-MacBook-Air:frontend macbook$ mv .gitignore ../.gitignore
+MacBooks-MacBook-Air:frontend macbook$ 
+MacBooks-MacBook-Air:frontend macbook$ cat ../.gitignore
+# See 
+https://docs.github.com/get-started/getting-started-with-git/ignoring-files 
+for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+.angular/cache
+frontend/node_modules
+frontend/dist
+MacBooks-MacBook-Air:frontend macbook$ 
+MacBooks-MacBook-Air:frontend macbook$ cd ..
+MacBooks-MacBook-Air:royal-tech macbook$ nano .gitignore
+
+  UW PICO 5.09                    File: .gitignore                    
+Modified  
+
+
+# See 
+https://docs.github.com/get-started/getting-started-with-git/ignoring-fil$
+
+# Compiled output
+/dist
+/tmp
+/out-tsc  
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log 
+yarn-error.log
+
+# IDEs and editors
+.idea/  
+.project  
+.classpath
+.c9/
+
+^G Get Help  ^O WriteOut  ^R Read File ^Y Prev Pg   ^K Cut Text  ^C Cur 
+Pos   
+^X Exit      ^J Justify   ^W Where is  ^V Next Pg   ^U UnCut Text^T To 
+Spell  
+
+# See 
+https://docs.github.com/get-started/getting-started-with-git/ignoring-files 
+for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Angular frontend ignores
+/frontend/node_modules
+/frontend/dist
+
+
+
+
