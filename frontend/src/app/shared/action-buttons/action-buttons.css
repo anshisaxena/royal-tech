@@ -1,0 +1,119 @@
+/* Submit Button - Top Right Position */
+.actions-section{
+    margin-top: 100px;
+}
+.submit-container {
+  position: fixed;
+  top: 120px;
+  right: 40px;
+  z-index: 1001;
+}
+
+/* Bottom Action Buttons Container */
+.bottom-actions-container {
+  position: fixed;
+  right: 40px;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Base Button Styling */
+.btn {
+  display: flex;
+  padding: 10px 60px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  min-height: 48px;
+  min-width: 160px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn span {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Submit Button */
+.btn-submit {
+  background: #082491;
+  box-shadow: 0 4px 16.6px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+}
+
+.btn-submit:hover {
+  background: #061d7a;
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Save Button */
+.btn-save {
+  background: #2363EB;
+  box-shadow: 0 4px 16.6px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+}
+
+.btn-save:hover {
+  background: #1a4fd6;
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Next Button */
+.btn-next {
+  border: 2px solid #082491;
+  background: #E2F2FE;
+  box-shadow: 0 4px 16.6px 0 rgba(0, 0, 0, 0.20);
+  color: #082491;
+}
+
+.btn-next:hover {
+  background: #d1e9fc;
+  border-color: #061d7a;
+  color: #061d7a;
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .submit-container {
+    top: 80px;
+    right: 20px;
+  }
+  
+  .bottom-actions-container {
+    right: 20px;
+    bottom: 20px;
+  }
+  
+  .btn {
+    padding: 8px 40px;
+    font-size: 12px;
+    min-width: 120px;
+  }
+}

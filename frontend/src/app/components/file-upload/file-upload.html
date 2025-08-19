@@ -1,73 +1,72 @@
 <div class="upload-container">
-    <h3 class="upload-title">File Upload</h3>
-  
-    <!-- State 1: Before Upload -->
-    <div
-      class="upload-box"
-      *ngIf="!uploadedFile"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave($event)"
-      (drop)="onFileDrop($event)"
-      [class.dragging]="isDragging"
-      (click)="fileInput.click()"
-    >
-      <!-- Upload icon -->
-      <div class="upload-icon">
+  <h3 class="upload-title">File Upload</h3>
+
+  <!-- State 1: Before Upload -->
+  <div
+    class="upload-box"
+    *ngIf="!uploadedFile"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onFileDrop($event)"
+    [class.dragging]="isDragging"
+    (click)="fileInput.click()"
+  >
+    <!-- Upload icon -->
+    <div class="upload-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+      </svg>
+    </div>
+    <p>Click or drag file to this area to upload</p>
+    <input
+      type="file"
+      hidden
+      #fileInput
+      (change)="onFileSelected($event)"
+      accept=".pdf,.jpg,.jpeg,.png"
+    />
+  </div>
+
+  <!-- State 2: Uploading / Uploaded -->
+  <div class="file-card" *ngIf="uploadedFile">
+    <div class="file-info">
+      <!-- File icon -->
+      <div class="file-icon">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />
+            d="M7 21h10a2 2 0 002-2V9.5a1 1 0 00-.293-.707l-5.5-5.5A1 1 0 0012.5 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
         </svg>
       </div>
-      <p>Click or drag file to this area to upload</p>
-      <input
-        type="file"
-        hidden
-        #fileInput
-        (change)="onFileSelected($event)"
-        accept=".pdf,.jpg,.jpeg,.png"
-      />
-    </div>
-  
-    <!-- State 2: Uploading / Uploaded -->
-    <div class="file-card" *ngIf="uploadedFile">
-      <div class="file-info">
-        <!-- File icon -->
-        <div class="file-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M7 21h10a2 2 0 002-2V9.5a1 1 0 00-.293-.707l-5.5-5.5A1 1 0 0012.5 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <div>
-          <strong>{{ uploadedFile.name }}</strong>
-          <p>
-            File Format: {{ getFileFormat() }} |
-            Size: {{ uploadedFile.size / 1024 | number:'1.0-0' }} KB
-          </p>
-        </div>
-        <button class="remove-btn" (click)="onCancel()">✕</button>
+      <div>
+        <strong>{{ uploadedFile.name }}</strong>
+        <p>
+          File Format: {{ getFileFormat() }} |
+          Size: {{ uploadedFile.size / 1024 | number:'1.0-0' }} KB
+        </p>
       </div>
-  
-      <!-- Progress bar -->
-      <div class="file-progress">
-        <div class="progress-bar" [style.width.%]="uploadProgress"></div>
-      </div>
+      <button class="remove-btn" (click)="onCancel()">✕</button>
     </div>
-  
-    <!-- Accepted formats -->
-    <p class="note">
-      Formats accepted are <b>.pdf</b>, <b>.jpg</b>, and <b>.png</b>
-    </p>
-  
-    <!-- Sample Template Download (only before upload) -->
-    <div class="template-download" *ngIf="!uploadedFile">
-      <button class="download-btn" (click)="downloadTemplate()">Download Sample Template</button>
-    </div>
-  
-    <!-- Action buttons -->
-    <div class="actions">
-      <button class="cancel-btn" (click)="onCancel()">Cancel</button>
-      <button class="continue-btn" [disabled]="!uploadComplete" (click)="onContinue()">Continue</button>
+
+    <!-- Progress bar -->
+    <div class="file-progress">
+      <div class="progress-bar" [style.width.%]="uploadProgress"></div>
     </div>
   </div>
-  
+
+  <!-- Accepted formats -->
+  <p class="note">
+    Formats accepted are <b>.pdf</b>, <b>.jpg</b>, and <b>.png</b>
+  </p>
+
+  <!-- Sample Template Download (only before upload) -->
+  <div class="template-download" *ngIf="!uploadedFile">
+    <button class="download-btn" (click)="downloadTemplate()">Download Sample Template</button>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="actions">
+    <button class="cancel-btn" (click)="onCancel()">Cancel</button>
+    <button class="continue-btn" [disabled]="!uploadComplete" (click)="onContinue()">Continue</button>
+  </div>
+</div>

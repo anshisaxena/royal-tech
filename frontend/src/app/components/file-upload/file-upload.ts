@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { FileUploadService } from '../../services/file-upload.service';
 
 @Component({
   selector: 'app-file-upload',
@@ -16,6 +18,8 @@ export class FileUploadComponent {
   uploadComplete = false;
   private uploadInterval: any;
 
+  constructor(private router: Router, private fileService: FileUploadService) {}
+
   onDragOver(event: DragEvent) {
     event.preventDefault();
     this.isDragging = true;
@@ -29,18 +33,15 @@ export class FileUploadComponent {
   onFileDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
-
     if (event.dataTransfer?.files?.length) {
-      const file = event.dataTransfer.files[0];
-      this.handleFile(file);
+      this.handleFile(event.dataTransfer.files[0]);
     }
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
-      const file = input.files[0];
-      this.handleFile(file);
+      this.handleFile(input.files[0]);
     }
   }
 
@@ -51,14 +52,11 @@ export class FileUploadComponent {
       this.uploadProgress = 0;
       this.uploadComplete = false;
 
-      // Show preview if image
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => (this.previewUrl = reader.result as string);
         reader.readAsDataURL(file);
       }
-
-      // Simulate upload progress
       this.simulateUpload();
     } else {
       alert('Invalid file type. Only .pdf, .jpg/.jpeg and .png allowed.');
@@ -73,29 +71,27 @@ export class FileUploadComponent {
   private simulateUpload() {
     this.uploadProgress = 0;
     clearInterval(this.uploadInterval);
-
     this.uploadInterval = setInterval(() => {
       if (this.uploadProgress < 100) {
         this.uploadProgress += 10;
       } else {
         clearInterval(this.uploadInterval);
-        this.uploadComplete = true; // ✅ Mark upload as done
+        this.uploadComplete = true;
       }
     }, 300);
   }
 
   getFileFormat(): string {
     if (!this.uploadedFile) return '';
-    const type = this.uploadedFile.type;
-    if (type === 'application/pdf') return 'PDF';
-    if (type === 'image/png') return 'PNG';
-    if (type === 'image/jpeg') return 'JPG';
+    if (this.uploadedFile.type === 'application/pdf') return 'PDF';
+    if (this.uploadedFile.type === 'image/png') return 'PNG';
+    if (this.uploadedFile.type === 'image/jpeg') return 'JPG';
     return 'Unknown';
   }
 
   downloadTemplate() {
     const link = document.createElement('a');
-    link.href = 'assets/resume.pdf'; // Ensure file exists in assets/
+    link.href = 'assets/resume.pdf';
     link.download = 'resume.pdf';
     link.click();
   }
@@ -106,13 +102,12 @@ export class FileUploadComponent {
     this.uploadProgress = 0;
     this.uploadComplete = false;
     clearInterval(this.uploadInterval);
-    console.log('Upload cancelled');
   }
 
   onContinue() {
     if (this.uploadedFile) {
-      console.log('Proceeding with file:', this.uploadedFile.name);
-      // 👉 Send file to backend with FormData
+      this.fileService.setFile(this.uploadedFile);
+      this.router.navigate(['/training']); // 👉 Go to training page
     }
   }
 }

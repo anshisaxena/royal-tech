@@ -1,0 +1,94 @@
+.training-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.header-section {
+  background: white;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.content-section {
+  flex: 1;
+  background: white;
+  padding: 40px;
+  margin: 20px;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1000px;
+}
+
+.pdf-processor-placeholder {
+  text-align: center;
+  color: #6c757d;
+}
+
+.pdf-processor-placeholder p {
+  font-size: 18px;
+  margin-bottom: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+.pdf-processor-placeholder .note {
+  font-size: 14px;
+  font-style: italic;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* .actions-section {
+} */
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .content-section {
+    margin: 15px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-section {
+    margin: 10px;
+    padding: 15px;
+  }
+}
+.pdf-image-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.preview-image {
+  max-width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.pdf-processor-placeholder {
+  text-align: center;
+  color: #6c757d;
+}
+
+.pdf-processor-placeholder p {
+  font-size: 18px;
+  margin-bottom: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
