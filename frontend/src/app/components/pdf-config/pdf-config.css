@@ -1,0 +1,390 @@
+.pdf-config-container {
+  width: 391px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 24px;
+  display: inline-flex;
+  background: #F1F9FF;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* Prompt Section */
+.prompt-section {
+  align-self: stretch;
+  padding: 10px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: flex;
+}
+
+.prompt-input-container {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: flex;
+}
+
+.prompt-label {
+  color: #082491;
+  font-size: 16px;
+  font-family: Inter;
+  font-weight: 500;
+  margin-bottom: 6px;
+  word-wrap: break-word;
+}
+
+.prompt-input {
+  align-self: stretch;
+  height: 41.54px;
+  padding: 6.39px 12.78px;
+  border-radius: 6.39px;
+  outline: 0.80px #5570F1 solid;
+  outline-offset: -0.80px;
+  border: none;
+  background: white;
+  color: #999999;
+  font-size: 16px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.prompt-input:focus {
+  outline: 0.80px #0088FF solid;
+  outline-offset: -0.80px;
+}
+
+.prompt-input::placeholder {
+  color: #999999;
+}
+
+.suggested-label {
+  color: #ABAFB1;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  margin-top: 3.20px;
+  word-wrap: break-word;
+}
+
+/* Suggested Prompts */
+.suggested-prompts {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: flex;
+}
+
+.prompt-row {
+  align-self: stretch;
+  font-size: 12px;
+  padding: 10px 0;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+
+.prompt-chip {
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.84);
+  border-radius: 20px;
+  outline: 1px #058FFF solid;
+  outline-offset: -1px;
+  color: #4E4E4E;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  word-wrap: break-word;
+  transition: all 0.3s ease;
+}
+
+.prompt-chip:hover {
+  background: #058FFF;
+  color: white;
+}
+
+/* Config Section */
+.config-section {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  display: flex;
+}
+
+.section-header {
+  align-self: stretch;
+  padding: 16px 20px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 12px;
+  display: inline-flex;
+  cursor: pointer;
+  /* background: white; */
+  border-radius: 8px;
+}
+
+.section-title {
+  flex: 1 1 0;
+  color: #181818;
+  font-size: 14px;
+  font-family: Inter;
+  font-weight: 500;
+  line-height: 24px;
+  word-wrap: break-word;
+}
+
+.expand-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.section-divider {
+  align-self: stretch;
+  height: 1px;
+  background: #2363EB;
+  opacity: 0.38;
+  margin: 0 20px;
+}
+
+/* Field Form */
+.field-form {
+  align-self: stretch;
+  padding: 0 20px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px;
+  display: flex;
+}
+
+.form-group {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: flex;
+}
+
+.form-group label {
+  color: #141414;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.form-group input[type="text"] {
+  align-self: stretch;
+  height: 41.54px;
+  padding: 6.39px 12.78px;
+  border-radius: 6.39px;
+  outline: 0.80px #0088FF solid;
+  outline-offset: -0.80px;
+  border: none;
+  background: white;
+  color: #999999;
+  font-size: 16px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.form-group input[type="text"]:focus {
+  outline: 0.80px #5570F1 solid;
+  color: #141414;
+}
+
+.form-group input[type="text"]::placeholder {
+  color: #999999;
+}
+
+/* Checkbox Row */
+.checkbox-row {
+  align-self: stretch;
+  padding: 30px 0 20px 0;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+
+.checkbox-group {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  border-radius: 2px;
+  border: 2px solid #0088FF;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  position: relative;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  background: #0088FF;
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.checkbox-group label {
+  color: black;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  cursor: pointer;
+  word-wrap: break-word;
+}
+
+/* Action Group */
+.action-group {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 11px;
+  display: flex;
+}
+
+.action-btn {
+  padding: 5px;
+  border-radius: 20px;
+  outline: 1px #082491 solid;
+  outline-offset: -1px;
+  background: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background: #082491;
+}
+
+.action-btn:hover svg path {
+  fill: white;
+}
+
+.action-group span {
+  color: black;
+  font-size: 12px;
+  font-family: Inter;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+/* Rule List */
+.rule-list {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 17.13px;
+  display: flex;
+  padding: 0 20px;
+}
+
+.rule-item {
+  align-self: stretch;
+  padding: 8.16px 16.32px;
+  background: white;
+  box-shadow: 0px 3.26px 19.74px rgba(0, 0, 0, 0.07);
+  border-radius: 6.53px;
+  justify-content: space-between;
+  align-items: center;
+  display: inline-flex;
+  min-height: 34px;
+  display: flex; 
+  align-items: center; 
+  flex: 1;
+}
+
+.rule-name {
+  color: #292929;
+  font-size: 13.87px;
+  font-family: Inter;
+  font-weight: 500;
+  line-height: 17.95px;
+  word-wrap: break-word;
+}
+
+.rule-actions {
+  justify-content: center;
+  align-items: center;
+  gap: 8.16px;
+  display: flex;
+}
+
+.rule-actions button {
+  width: 32px; 
+  height: 32px; 
+  background: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.rule-actions button:hover {
+  background: #f5f5f5;
+}
+
+.rule-actions button svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pdf-config-container {
+    width: 100%;
+    max-width: 391px;
+  }
+  
+  .checkbox-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .prompt-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

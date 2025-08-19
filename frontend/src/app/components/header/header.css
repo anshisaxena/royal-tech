@@ -4,7 +4,7 @@
   gap: 60px;
   align-items: center;
   padding: 24px 40px;
-  background: white;
+  /* background: white; */
   width: 100%;
   box-sizing: border-box;
   max-width: none;
@@ -60,14 +60,13 @@
   align-self: stretch;
   border-radius: 100px;
   border: 1px solid #0481E6;
-  mix-blend-mode: plus-darker;
   font-family: "SF Pro", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 17px;
   font-style: normal;
   font-weight: 400;
   line-height: 22px;
   letter-spacing: -0.08px;
-  background: white;
+  background: #F1F9FF;
   outline: none;
   min-width: 400px;
 }

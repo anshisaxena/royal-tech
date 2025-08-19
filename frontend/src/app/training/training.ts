@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { Header } from '../shared/header/header';
-import { ActionButtons } from '../shared/action-buttons/action-buttons';
+import { Header } from '../components/header/header';
+import { ActionButtons } from '../components/action-buttons/action-buttons';
+import { PdfConfig } from '../components/pdf-config/pdf-config'
 
 @Component({
   selector: 'app-training',
   standalone: true,
-  imports: [Header, ActionButtons],
+  imports: [Header, ActionButtons, PdfConfig],
   templateUrl: './training.html',
   styleUrl: './training.css'
 })
@@ -26,5 +27,17 @@ export class Training {
   
   handleNext() {
     console.log('Next clicked - Moving to next step...');
+  }
+
+  handlePromptChange(prompt: string) {
+    console.log('Prompt changed:', prompt);
+  }
+  
+  handleFieldConfigChange(config: any) {
+    console.log('Field config changed:', config);
+  }
+  
+  handleActionTriggered(action: string) {
+    console.log('Action triggered:', action);
   }
 }
