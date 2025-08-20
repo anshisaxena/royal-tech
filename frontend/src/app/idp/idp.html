@@ -1,0 +1,28 @@
+<div class="training-container">
+  <!-- Document Header Section -->
+  <div class="header-section">
+    <app-header 
+      [documentName]="documentName"
+      (searchQuery)="handleSearch($event)">
+    </app-header>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="content-section">
+    <div class="pdf-processor-placeholder">
+      <p>PDF Processing Component will be imported here</p>
+    </div>
+  </div>
+
+  <!-- Action Buttons Section -->
+  <div class="actions-section">
+    <app-action-buttons
+      [showSubmit]="true"
+      [showSave]="true" 
+      [showNext]="true"
+      (submit)="handleSubmit()"
+      (save)="handleSave()"
+      (next)="handleNext()">
+    </app-action-buttons>
+  </div>
+</div>
