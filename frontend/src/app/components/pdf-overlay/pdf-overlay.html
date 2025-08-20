@@ -1,0 +1,37 @@
+<div class="pdf-viewer-container">
+  <div class="pdf-scroll-layer">
+    <!-- PDF iframe -->
+    <iframe *ngIf="fileURL"
+            [src]="fileURL | safeUrl"
+            class="pdf-iframe">
+    </iframe>
+
+    <!-- Overlay layer with boxes -->
+    <div class="overlay-layer">
+      <ng-container *ngFor="let field of fieldMapping">
+        <!-- Red (readonly) -->
+        <div class="box red-dashed"
+             [style.top.px]="field.top"
+             [style.left.px]="field.left"
+             [style.width.px]="field.width"
+             [style.height.px]="field.height * 0.5">
+          {{ originalData?.[field.key] }}
+        </div>
+
+        <!-- Editable input -->
+        <input type="text"
+               class="box"
+               [ngClass]="{
+                 'blue-border': !editedFields.has(field.key),
+                 'yellow-border': editedFields.has(field.key)
+               }"
+               [(ngModel)]="tempValues[field.key]"
+               (blur)="onBlur(field.key)"
+               [style.top.px]="field.top"
+               [style.left.px]="field.left + field.width + 20"
+               [style.width.px]="field.width"
+               [style.height.px]="field.height * 0.5" />
+      </ng-container>
+    </div>
+  </div>
+</div>

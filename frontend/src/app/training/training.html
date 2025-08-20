@@ -1,46 +1,35 @@
 <div class="training-container">
   <!-- Header -->
-  <div class="header-section">
-    <app-header 
-      [documentName]="documentName"
-      (searchQuery)="handleSearch($event)">
-    </app-header>
-  </div>
+  <app-header [documentName]="documentName" (searchQuery)="handleSearch($event)"></app-header>
 
   <!-- Content -->
   <div class="content-section">
     <ng-container *ngIf="fileURL; else placeholder">
-      
-      <!-- PDF Preview -->
-      <iframe *ngIf="uploadedFile?.type === 'application/pdf'" 
-              [src]="fileURL | safeUrl" 
-              width="100%" 
-              height="600px">
-      </iframe>
-
-      <!-- Image Preview -->
-      <div *ngIf="isImage(uploadedFile)" class="pdf-processor-placeholder">
-        <img [src]="fileURL" class="preview-image" />
+      <div class="pdf-processor-placeholder">
+        <app-pdf-overlay
+          class="pdf-viewer"
+          [fileURL]="fileURL"
+          [originalData]="originalData"
+          [jsonData]="jsonData">
+        </app-pdf-overlay>
       </div>
-
     </ng-container>
 
     <ng-template #placeholder>
       <div class="pdf-processor-placeholder">
-        <p>PDF Processing Component will be imported here</p>
+        <p>No file uploaded yet</p>
+        <p class="note">Upload a PDF to preview it here</p>
       </div>
     </ng-template>
   </div>
 
   <!-- Action Buttons -->
-  <div class="actions-section">
-    <app-action-buttons
-      [showSubmit]="true"
-      [showSave]="true" 
-      [showNext]="true"
-      (submit)="handleSubmit()"
-      (save)="handleSave()"
-      (next)="handleNext()">
-    </app-action-buttons>
-  </div>
+  <app-action-buttons
+    [showSubmit]="true"
+    [showSave]="true"
+    [showNext]="true"
+    (submit)="handleSubmit()"
+    (save)="handleSave()"
+    (next)="handleNext()">
+  </app-action-buttons>
 </div>

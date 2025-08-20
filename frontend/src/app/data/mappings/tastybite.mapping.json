@@ -1,0 +1,6 @@
+[
+  { "key": "InvoiceNo", "top": 244, "left": 390, "width": 120, "height": 30 },
+  { "key": "InvoiceDate", "top": 264, "left": 390, "width": 120, "height": 30 },
+  { "key": "ExporterName", "top": 80, "left": 150, "width": 250, "height": 30 },
+  { "key": "TotalGrossWeight", "top": 650, "left": 200, "width": 150, "height": 30 }
+]

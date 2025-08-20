@@ -1,21 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Header } from '../shared/header/header';
 import { ActionButtons } from '../shared/action-buttons/action-buttons';
 import { FileUploadService } from '../services/file-upload.service';
-import { SafeUrlPipe } from '../pipes/safe-url.pipe';
+import { PdfOverlayComponent } from '../components/pdf-overlay/pdf-overlay';
 
 @Component({
   selector: 'app-training',
   standalone: true,
-  imports: [Header, ActionButtons, NgIf, SafeUrlPipe],
+  imports: [Header, ActionButtons, NgIf, PdfOverlayComponent],
   templateUrl: './training.html',
   styleUrls: ['./training.css']
 })
-export class Training implements OnInit {
+export class Training implements OnInit, OnDestroy {
   documentName: string = 'IMPORT';
   uploadedFile: File | null = null;
   fileURL: string | null = null;
+
+  originalData: any = {
+    InvoiceNo: 'E260302',
+    InvoiceDate: '08/07/2025',
+    ExporterName: 'TASTY BITE EATABLES LTD',
+    TotalGrossWeight: '24124.360'
+  };
+
+  jsonData: any = {
+    InvoiceNo: 'E260302',
+    InvoiceDate: '08/07/2025',
+    ExporterName: 'TASTY BITE EATABLES LTD',
+    TotalGrossWeight: '24124.360'
+  };
 
   constructor(private fileService: FileUploadService) {}
 
@@ -27,24 +41,15 @@ export class Training implements OnInit {
     }
   }
 
-  // ✅ Helper to safely check if file is an image
-  isImage(file: File | null): boolean {
-    return !!file && file.type.startsWith('image/');
+  ngOnDestroy() {
+    if (this.fileURL) {
+      URL.revokeObjectURL(this.fileURL);
+      this.fileURL = null; // prevent accidental reuse
+    }
   }
 
-  handleSearch(query: string) {
-    console.log('Search query:', query);
-  }
-
-  handleSubmit() {
-    console.log('Submit clicked - Processing document...');
-  }
-
-  handleSave() {
-    console.log('Save clicked - Saving progress...');
-  }
-
-  handleNext() {
-    console.log('Next clicked - Moving to next step...');
-  }
+  handleSearch(query: string) { console.log('Search query:', query); }
+  handleSubmit() { console.log('Submit clicked'); }
+  handleSave() { console.log('Save clicked'); }
+  handleNext() { console.log('Next clicked'); }
 }
