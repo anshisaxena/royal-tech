@@ -52,11 +52,13 @@ export class FileUploadComponent {
       this.uploadProgress = 0;
       this.uploadComplete = false;
 
+      // ✅ Generate preview for images
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = () => (this.previewUrl = reader.result as string);
         reader.readAsDataURL(file);
       }
+
       this.simulateUpload();
     } else {
       alert('Invalid file type. Only .pdf, .jpg/.jpeg and .png allowed.');
@@ -65,7 +67,11 @@ export class FileUploadComponent {
 
   isValidFile(file: File): boolean {
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-    return allowedTypes.includes(file.type);
+    if (allowedTypes.includes(file.type)) return true;
+
+    // ✅ fallback by extension (handles drag & drop cases where type = "")
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    return ['pdf', 'jpg', 'jpeg', 'png'].includes(ext || '');
   }
 
   private simulateUpload() {
@@ -86,7 +92,9 @@ export class FileUploadComponent {
     if (this.uploadedFile.type === 'application/pdf') return 'PDF';
     if (this.uploadedFile.type === 'image/png') return 'PNG';
     if (this.uploadedFile.type === 'image/jpeg') return 'JPG';
-    return 'Unknown';
+    // fallback
+    const ext = this.uploadedFile.name.split('.').pop()?.toUpperCase();
+    return ext || 'Unknown';
   }
 
   downloadTemplate() {

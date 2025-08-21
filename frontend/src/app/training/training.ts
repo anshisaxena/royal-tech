@@ -23,7 +23,8 @@ export class Training implements OnInit, OnDestroy {
   documentName: string = 'IMPORT';
   uploadedFile: File | null = null;
   fileURL: string | null = null;
-  showPDF: boolean = true; // Ensure PDF viewer is shown by default
+  showPDF: boolean = true;
+  fileType: string | null = null; // NEW: pdf | image
 
   originalData: any = {
     InvoiceNo: 'E260302',
@@ -44,15 +45,21 @@ export class Training implements OnInit, OnDestroy {
   ngOnInit() {
     this.uploadedFile = this.fileService.getFile();
     if (this.uploadedFile) {
-      this.fileURL = URL.createObjectURL(this.uploadedFile); // Generate temporary URL
+      this.fileURL = URL.createObjectURL(this.uploadedFile);
       this.documentName = this.uploadedFile.name;
+
+      // Detect type
+      if (this.uploadedFile.type.includes('pdf')) {
+        this.fileType = 'pdf';
+      } else if (this.uploadedFile.type.includes('image')) {
+        this.fileType = 'image';
+      }
     }
   }
 
   ngOnDestroy() {
-    // Clean up the generated file URL when the component is destroyed to prevent memory leaks
     if (this.fileURL) {
-      URL.revokeObjectURL(this.fileURL); // Revoke the created URL to free memory
+      URL.revokeObjectURL(this.fileURL);
       this.fileURL = null;
     }
   }

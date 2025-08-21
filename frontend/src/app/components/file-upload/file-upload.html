@@ -48,6 +48,11 @@
       <button class="remove-btn" (click)="onCancel()">✕</button>
     </div>
 
+    <!-- ✅ Show preview only if it's an image -->
+    <div class="file-preview" *ngIf="previewUrl">
+      <img [src]="previewUrl" alt="Preview" />
+    </div>
+
     <!-- Progress bar -->
     <div class="file-progress">
       <div class="progress-bar" [style.width.%]="uploadProgress"></div>

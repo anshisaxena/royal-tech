@@ -4,31 +4,42 @@
 
   <!-- Content -->
   <div class="content-section">
-    <ng-container *ngIf="fileURL && showPDF; else placeholder">
-      <!-- PDF Viewer Section -->
-      <div class="pdf-processor-placeholder">
-        <app-pdf-overlay
-          class="pdf-viewer"
-          [fileURL]="fileURL"
-          [originalData]="originalData"
-          [jsonData]="jsonData">
-        </app-pdf-overlay>
-      </div>
+    <ng-container *ngIf="fileURL; else placeholder">
 
-      <!-- PDF Config Section (Positioned Between PDF Viewer and Action Buttons) -->
-      <div class="config-section">
-        <app-pdf-config
-          (promptChange)="handlePromptChange($event)"
-          (fieldConfigChange)="handleFieldConfigChange($event)"
-          (actionTriggered)="handleActionTriggered($event)">
-        </app-pdf-config>
-      </div>
+      <!-- PDF Viewer -->
+      <ng-container *ngIf="fileType === 'pdf' && showPDF">
+        <div class="pdf-processor-placeholder">
+          <app-pdf-overlay
+            class="pdf-viewer"
+            [fileURL]="fileURL"
+            [originalData]="originalData"
+            [jsonData]="jsonData">
+          </app-pdf-overlay>
+        </div>
+
+        <!-- Config only for PDF -->
+        <div class="config-section">
+          <app-pdf-config
+            (promptChange)="handlePromptChange($event)"
+            (fieldConfigChange)="handleFieldConfigChange($event)"
+            (actionTriggered)="handleActionTriggered($event)">
+          </app-pdf-config>
+        </div>
+      </ng-container>
+
+      <!-- Image Viewer -->
+      <ng-container *ngIf="fileType === 'image'">
+        <div class="pdf-processor-placeholder">
+          <img [src]="fileURL" alt="Uploaded image" class="image-viewer" />
+        </div>
+      </ng-container>
+
     </ng-container>
 
     <ng-template #placeholder>
       <div class="pdf-processor-placeholder">
         <p>No file uploaded yet</p>
-        <p class="note">Upload a PDF to preview it here</p>
+        <p class="note">Upload a PDF or Image to preview it here</p>
       </div>
     </ng-template>
   </div>

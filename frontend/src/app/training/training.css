@@ -20,6 +20,14 @@
   width: 100%;
   margin-left: 30px;  /* Push the content further to the left */
 }
+.image-viewer {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 
 .pdf-processor-placeholder {
   width: 50%;
