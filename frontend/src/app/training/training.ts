@@ -28,18 +28,20 @@ export class Training implements OnInit, OnDestroy {
   showPDF: boolean = true;
 
   originalData: any = {
-    InvoiceNo: 'E260302',
-    InvoiceDate: '08/07/2025',
-    ExporterName: 'TASTY BITE EATABLES LTD',
-    TotalGrossWeight: '24124.360'
+    "IRN No": "c965d001b813b0078a50d70b0d5dea498cba7bccc27fdcf082af9441e12b5b71",
+    "Exporter": "GODREJ & BOYCE MFG. CO. LTD.",
+    "Tax Invoice No": "1000Q1X11000197",
+    "Tax Invoice Date": "04/03/2025",
+    "GST No": "27AAACG1395D1ZU",
+    "Consignee": "SENSY S.A.",
+    "State of Origin": "27 MAHARASHTRA",
+    "District of Origin": "483 MUMBAI SUBURBAN",
+    "Buyer/Applicant": "SENSY S.A.",
+    "Commission Payable": "0.0"
   };
 
-  jsonData: any = {
-    InvoiceNo: 'E260302',
-    InvoiceDate: '08/07/2025',
-    ExporterName: 'TASTY BITE EATABLES LTD',
-    TotalGrossWeight: '24124.360'
-  };
+  jsonData: any = { ...this.originalData };
+
 
   constructor(private fileService: FileUploadService) {}
 

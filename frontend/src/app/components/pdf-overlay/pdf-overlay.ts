@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PdfViewerModule } from 'ng2-pdf-viewer'; // ✅ Make sure it's imported
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { MappingService } from '../../services/mapping.service';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 
@@ -11,7 +11,7 @@ import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
   imports: [
     CommonModule,
     FormsModule,
-    PdfViewerModule, // ✅ ADD THIS LINE
+    PdfViewerModule,
     SafeUrlPipe
   ],
   templateUrl: './pdf-overlay.html',
@@ -29,12 +29,12 @@ export class PdfOverlayComponent implements OnInit {
   constructor(private mappingService: MappingService) {}
 
   ngOnInit() {
-    this.fieldMapping = this.mappingService.getMapping('tastybite');
+    this.fieldMapping = this.mappingService.getMapping('godrej');
 
     if (this.jsonData) {
-      for (const field of this.fieldMapping) {
+      this.fieldMapping.forEach(field => {
         this.tempValues[field.key] = this.jsonData[field.key] || '';
-      }
+      });
     }
   }
 

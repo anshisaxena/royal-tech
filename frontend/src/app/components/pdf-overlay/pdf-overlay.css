@@ -1,6 +1,6 @@
 .pdf-viewer-container {
   width: 100%;
-  height: 800px;
+  height: 800px; 
   overflow: auto;
   border: 1px solid #ccc;
   position: relative;
@@ -9,16 +9,12 @@
 .pdf-scroll-layer {
   position: relative;
   width: 100%;
-  height: 1200px; /* Adjust to your PDF's height */
+  height: 100%;
 }
 
-.pdf-iframe {
+.pdf-viewer {
   width: 100%;
   height: 100%;
-  border: none;
-  display: block;
-  position: relative;
-  z-index: 1;
 }
 
 .overlay-layer {
@@ -31,11 +27,10 @@
   pointer-events: none;
 }
 
-/* Common box styles */
 .box {
   position: absolute;
   font-size: 10px;
-  padding: 1px 4px;
+  padding: 2px 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -43,7 +38,6 @@
   pointer-events: auto;
 }
 
-/* Red (readonly) box */
 .red-dashed {
   border: 2px dashed red;
   background-color: rgba(255, 0, 0, 0.15);
@@ -51,7 +45,6 @@
   -webkit-backdrop-filter: blur(4px);
 }
 
-/* Blue input (default) */
 input.blue-border {
   border: 2px solid blue;
   background-color: rgba(0, 0, 255, 0.1);
@@ -60,7 +53,6 @@ input.blue-border {
   color: black;
 }
 
-/* Yellow input (after editing) */
 input.yellow-border {
   border: 2px solid orange;
   background-color: rgba(255, 255, 0, 0.2);
