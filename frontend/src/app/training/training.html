@@ -4,20 +4,19 @@
 
   <!-- Content -->
   <div class="content-section">
-    <ng-container *ngIf="fileURL; else placeholder">
+    <ng-container *ngIf="uploadedFiles.length; else placeholder">
 
       <!-- PDF Viewer -->
       <ng-container *ngIf="fileType === 'pdf' && showPDF">
         <div class="pdf-processor-placeholder">
           <app-pdf-overlay
             class="pdf-viewer"
-            [fileURL]="fileURL"
+            [fileURL]="getFileURL(uploadedFiles[0])"
             [originalData]="originalData"
             [jsonData]="jsonData">
           </app-pdf-overlay>
         </div>
 
-        <!-- Config only for PDF -->
         <div class="config-section">
           <app-pdf-config
             (promptChange)="handlePromptChange($event)"
@@ -29,8 +28,10 @@
 
       <!-- Image Viewer -->
       <ng-container *ngIf="fileType === 'image'">
-        <div class="pdf-processor-placeholder">
-          <img [src]="fileURL" alt="Uploaded image" class="image-viewer" />
+        <div class="images-scroll-container">
+          <div class="image-wrapper" *ngFor="let file of uploadedFiles">
+            <img [src]="getFileURL(file)" [alt]="file.name" class="image-viewer" />
+          </div>
         </div>
       </ng-container>
 

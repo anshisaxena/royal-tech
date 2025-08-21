@@ -1,0 +1,226 @@
+[
+    {
+      "key": "InvoiceNo",
+      "top": 260,
+      "left": 430,
+      "width": 120,
+      "height": 30,
+      "pageNo": 1
+    },
+    {
+      "key": "InvoiceDate",
+      "top": 280,
+      "left": 430,
+      "width": 120,
+      "height": 30,
+      "pageNo": 1
+    },
+    {
+      "key": "ExporterName",
+      "top": 80,
+      "left": 140,
+      "width": 250,
+      "height": 30,
+      "pageNo": 1
+    },
+    {
+      "key": "TotalGrossWeight",
+      "top": 790,
+      "left": 170,
+      "width": 150,
+      "height": 30,
+      "pageNo": 1
+    },
+    {
+      "key": "ExporterName",
+      "top": 579,
+      "left": 161,
+      "width": 469,
+      "height": 28,
+      "pageNo": 2
+    },
+    {
+      "key": "Consignee",
+      "top": 894,
+      "left": 159,
+      "width": 337,
+      "height": 29,
+      "pageNo": 2
+    },
+    {
+      "key": "GSTNo",
+      "top": 777,
+      "left": 1088,
+      "width": 379,
+      "height": 28,
+      "pageNo": 2
+    },
+    {
+      "key": "StateOfOrigin",
+      "top": 1406,
+      "left": 881,
+      "width": 291,
+      "height": 30,
+      "pageNo": 2
+    },
+    {
+      "key": "DistrictOfOrigin",
+      "top": 1448,
+      "left": 929,
+      "width": 357,
+      "height": 28,
+      "pageNo": 2
+    },
+    {
+      "key": "TaxInvoiceNo",
+      "top": 933,
+      "left": 1815,
+      "width": 251,
+      "height": 33,
+      "pageNo": 2
+    },
+    {
+      "key": "TaxInvoiceDate",
+      "top": 933,
+      "left": 2166,
+      "width": 149,
+      "height": 33,
+      "pageNo": 2
+    },
+    {
+      "key": "Sales Order No.",
+      "top": 1287,
+      "left": 118,
+      "width": 155,
+      "height": 33,
+      "pageNo": 2
+    },
+    {
+      "key": "Description of Goods",
+      "top": 1286,
+      "left": 871,
+      "width": 270,
+      "height": 37,
+      "pageNo": 2
+    },
+    {
+      "key": "Unit Rate",
+      "top": 1287,
+      "left": 1950,
+      "width": 124,
+      "height": 34,
+      "pageNo": 2
+    },
+    {
+      "key": "Amount EUR",
+      "top": 1286,
+      "left": 2219,
+      "width": 106,
+      "height": 35,
+      "pageNo": 2
+    },
+    {
+      "key": "PageNo",
+      "top": 384,
+      "left": 1933,
+      "width": 23,
+      "height": 31,
+      "pageNo": 3
+    },
+    {
+      "key": "TaxInvoiceNo",
+      "top": 936,
+      "left": 1816,
+      "width": 247,
+      "height": 28,
+      "pageNo": 3
+    },
+    {
+      "key": "TaxInvoiceDate",
+      "top": 933,
+      "left": 2166,
+      "width": 149,
+      "height": 34,
+      "pageNo": 3
+    },
+    {
+      "key": "CommissionPayable_Label",
+      "top": 1405,
+      "left": 159,
+      "width": 267,
+      "height": 37,
+      "pageNo": 3
+    },
+    {
+      "key": "CommissionPayable_Value",
+      "top": 1404,
+      "left": 776,
+      "width": 64,
+      "height": 38,
+      "pageNo": 3
+    },
+    {
+      "key": "Insurance_Label",
+      "top": 1482,
+      "left": 157,
+      "width": 138,
+      "height": 39,
+      "pageNo": 3
+    },
+    {
+      "key": "Sales Order No.",
+      "top": 1287,
+      "left": 118,
+      "width": 155,
+      "height": 34,
+      "pageNo": 3
+    },
+    {
+      "key": "No. & kind of pkgs",
+      "top": 1281,
+      "left": 401,
+      "width": 102,
+      "height": 43,
+      "pageNo": 3
+    },
+    {
+      "key": "Description of Goods",
+      "top": 1286,
+      "left": 871,
+      "width": 270,
+      "height": 38,
+      "pageNo": 3
+    },
+    {
+      "key": "Net weight/Gross weight",
+      "top": 1286,
+      "left": 1463,
+      "width": 150,
+      "height": 38,
+      "pageNo": 3
+    },
+    {
+      "key": "Quantity",
+      "top": 1286,
+      "left": 1691,
+      "width": 110,
+      "height": 39,
+      "pageNo": 3
+    },
+    {
+      "key": "Unit Rate",
+      "top": 1287,
+      "left": 1952,
+      "width": 124,
+      "height": 34,
+      "pageNo": 3
+    },
+    {
+      "key": "Amount EUR",
+      "top": 1286,
+      "left": 2219,
+      "width": 106,
+      "height": 35,
+      "pageNo": 3
+    }
+  ]

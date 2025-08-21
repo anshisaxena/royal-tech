@@ -10,24 +10,16 @@
 
 .content-section {
   flex: 1;
-  background:#F1F9FF;
+  background: #F1F9FF;
   padding: 0;
   margin: 0;
   display: flex;
   justify-content: flex-start;  /* Align content horizontally to the left */
-  align-items: flex-start;     /* Align content to the top */
+  align-items: flex-start;      /* Align content to the top */
   height: 100%;
   width: 100%;
-  margin-left: 30px;  /* Push the content further to the left */
+  margin-left: 30px;            /* Push the content further to the left */
 }
-.image-viewer {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 
 .pdf-processor-placeholder {
   width: 50%;
@@ -35,7 +27,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 800px; /* Prevent it from being too wide */
+  max-width: 800px;
 }
 
 .config-section {
@@ -45,7 +37,7 @@
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
-  max-height: calc(100vh - 100px); /* Prevent config section from overflowing */
+  max-height: calc(100vh - 100px);
 }
 
 .pdf-viewer {
@@ -67,17 +59,36 @@
   font-weight: 400;
 }
 
+/* Images Vertical Stack */
+.images-scroll-container {
+  display: flex;
+  flex-direction: column;   /* stack images vertically */
+  gap: 12px;
+  overflow-y: auto;         /* vertical scroll if needed */
+  max-height: 80vh;         /* optional: limit container height */
+  padding: 10px 0;
+}
+
+.image-wrapper img {
+  width: 100%;             /* full width for responsiveness */
+  max-width: 600px;        /* optional max width */
+  height: auto;            /* maintain aspect ratio */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  object-fit: cover;
+}
+
 /* Responsive Design */
 @media (max-width: 1400px) {
   .content-section {
-    width: 100%;  /* Ensure it takes full width for smaller screens */
-    margin-left: 0; /* Remove the left margin on smaller screens */
+    width: 100%;
+    margin-left: 0;
   }
 }
 
 @media (max-width: 1200px) {
   .content-section {
-    flex-direction: column;  /* Stack the PDF Viewer and Config vertically for smaller screens */
+    flex-direction: column;  /* Stack PDF and Config vertically */
     gap: 20px;
     height: auto;
     width: 100%;
@@ -85,7 +96,7 @@
   }
 
   .config-section {
-    width: 100%;  /* Make config section take full width in column layout */
+    width: 100%;
     max-width: 500px;
     align-self: center;
     height: auto;
@@ -109,5 +120,9 @@
   .content-section {
     margin: 0;
     padding: 0;
+  }
+
+  .image-wrapper img {
+    max-width: 100%;
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { NgIf, NgForOf } from '@angular/common'; // <-- import NgForOf
 import { Header } from '../components/header/header';
 import { ActionButtons } from '../components/action-buttons/action-buttons';
 import { FileUploadService } from '../services/file-upload.service';
@@ -13,6 +13,7 @@ import { PdfConfig } from '../components/pdf-config/pdf-config';
     Header,
     ActionButtons,
     NgIf,
+    NgForOf,        // <-- required for *ngFor
     PdfOverlayComponent,
     PdfConfig
   ],
@@ -21,10 +22,10 @@ import { PdfConfig } from '../components/pdf-config/pdf-config';
 })
 export class Training implements OnInit, OnDestroy {
   documentName: string = 'IMPORT';
-  uploadedFile: File | null = null;
-  fileURL: string | null = null;
+  uploadedFiles: File[] = [];
+  fileType: 'pdf' | 'image' | null = null;
+  fileURLs: Map<File, string> = new Map();
   showPDF: boolean = true;
-  fileType: string | null = null; // NEW: pdf | image
 
   originalData: any = {
     InvoiceNo: 'E260302',
@@ -43,52 +44,38 @@ export class Training implements OnInit, OnDestroy {
   constructor(private fileService: FileUploadService) {}
 
   ngOnInit() {
-    this.uploadedFile = this.fileService.getFile();
-    if (this.uploadedFile) {
-      this.fileURL = URL.createObjectURL(this.uploadedFile);
-      this.documentName = this.uploadedFile.name;
+    this.uploadedFiles = this.fileService.getFiles() || [];
 
-      // Detect type
-      if (this.uploadedFile.type.includes('pdf')) {
+    if (this.uploadedFiles.length > 0) {
+      const firstFile = this.uploadedFiles[0];
+      if (firstFile.type.includes('pdf')) {
         this.fileType = 'pdf';
-      } else if (this.uploadedFile.type.includes('image')) {
+        this.showPDF = true;
+      } else if (firstFile.type.includes('image')) {
         this.fileType = 'image';
+        this.showPDF = false;
       }
     }
   }
 
-  ngOnDestroy() {
-    if (this.fileURL) {
-      URL.revokeObjectURL(this.fileURL);
-      this.fileURL = null;
+  getFileURL(file: File): string {
+    if (!this.fileURLs.has(file)) {
+      this.fileURLs.set(file, URL.createObjectURL(file));
     }
+    return this.fileURLs.get(file)!;
   }
 
-  handleSearch(query: string) {
-    console.log('Search query:', query);
+  ngOnDestroy() {
+    this.fileURLs.forEach(url => URL.revokeObjectURL(url));
+    this.fileURLs.clear();
   }
 
-  handleSubmit() {
-    console.log('Submit clicked');
-  }
-
-  handleSave() {
-    console.log('Save clicked');
-  }
-
+  handleSearch(query: string) { console.log('Search query:', query); }
+  handleSubmit() { console.log('Submit clicked'); }
+  handleSave() { console.log('Save clicked'); }
   handleNext() {
-    console.log('Next clicked');
-  }
-
-  handlePromptChange(prompt: string) {
-    console.log('Prompt changed:', prompt);
-  }
-
-  handleFieldConfigChange(config: any) {
-    console.log('Field config changed:', config);
-  }
-
-  handleActionTriggered(action: string) {
-    console.log('Action triggered:', action);
-  }
+     console.log('Next clicked'); }
+  handlePromptChange(prompt: string) { console.log('Prompt changed:', prompt); }
+  handleFieldConfigChange(config: any) { console.log('Field config changed:', config); }
+  handleActionTriggered(action: string) { console.log('Action triggered:', action); }
 }

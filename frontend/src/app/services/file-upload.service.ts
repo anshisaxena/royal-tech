@@ -3,13 +3,23 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class FileUploadService {
-  private file: File | null = null;
+  private files: File[] = [];
 
-  setFile(file: File) {
-    this.file = file;
+  // Set multiple files
+  setFiles(files: File[]) {
+    this.files = files;
   }
 
-  getFile(): File | null {
-    return this.file;
+  // Add a single file (optional)
+  addFile(file: File) {
+    this.files.push(file);
+  }
+
+  getFiles(): File[] {
+    return this.files;
+  }
+
+  clearFiles() {
+    this.files = [];
   }
 }
