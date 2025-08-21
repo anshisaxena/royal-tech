@@ -4,7 +4,8 @@
 
   <!-- Content -->
   <div class="content-section">
-    <ng-container *ngIf="fileURL; else placeholder">
+    <ng-container *ngIf="fileURL && showPDF; else placeholder">
+      <!-- PDF Viewer Section -->
       <div class="pdf-processor-placeholder">
         <app-pdf-overlay
           class="pdf-viewer"
@@ -12,6 +13,15 @@
           [originalData]="originalData"
           [jsonData]="jsonData">
         </app-pdf-overlay>
+      </div>
+
+      <!-- PDF Config Section (Positioned Between PDF Viewer and Action Buttons) -->
+      <div class="config-section">
+        <app-pdf-config
+          (promptChange)="handlePromptChange($event)"
+          (fieldConfigChange)="handleFieldConfigChange($event)"
+          (actionTriggered)="handleActionTriggered($event)">
+        </app-pdf-config>
       </div>
     </ng-container>
 

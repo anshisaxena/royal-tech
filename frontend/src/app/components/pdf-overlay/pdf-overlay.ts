@@ -1,13 +1,19 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PdfViewerModule } from 'ng2-pdf-viewer'; // ✅ Make sure it's imported
 import { MappingService } from '../../services/mapping.service';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 
 @Component({
   selector: 'app-pdf-overlay',
   standalone: true,
-  imports: [CommonModule, FormsModule, SafeUrlPipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PdfViewerModule, // ✅ ADD THIS LINE
+    SafeUrlPipe
+  ],
   templateUrl: './pdf-overlay.html',
   styleUrls: ['./pdf-overlay.css']
 })
@@ -42,7 +48,7 @@ export class PdfOverlayComponent implements OnInit {
       if (newValue !== originalValue) {
         this.editedFields.add(key);
       } else {
-        this.editedFields.delete(key); // Revert to blue if unchanged
+        this.editedFields.delete(key);
       }
     }
   }

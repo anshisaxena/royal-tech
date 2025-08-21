@@ -1,49 +1,49 @@
 {
-  "hash": "6ce353f7",
-  "configHash": "73b62aab",
+  "hash": "2006391b",
+  "configHash": "9c0016b1",
   "lockfileHash": "c71753fc",
-  "browserHash": "7ed43582",
+  "browserHash": "7591b1f0",
   "optimized": {
     "@angular/common": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
       "file": "@angular_common.js",
-      "fileHash": "1450ef6a",
+      "fileHash": "3c7da84b",
       "needsInterop": false
     },
     "@angular/core": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
       "file": "@angular_core.js",
-      "fileHash": "c4ea3f8f",
+      "fileHash": "267da5c8",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "22923e2d",
       "needsInterop": false
     },
     "@angular/platform-browser": {
       "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
       "file": "@angular_platform-browser.js",
-      "fileHash": "8ae5401d",
+      "fileHash": "33679b08",
       "needsInterop": false
     },
     "@angular/router": {
       "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
       "file": "@angular_router.js",
-      "fileHash": "75bc2b06",
-      "needsInterop": false
-    },
-    "ng2-pdf-viewer": {
-      "src": "../../../../../../node_modules/ng2-pdf-viewer/fesm2022/ng2-pdf-viewer.mjs",
-      "file": "ng2-pdf-viewer.js",
-      "fileHash": "17a64b8a",
+      "fileHash": "d58a1d7b",
       "needsInterop": false
     },
     "zone.js": {
       "src": "../../../../../../node_modules/zone.js/fesm2015/zone.js",
       "file": "zone__js.js",
-      "fileHash": "24e72018",
+      "fileHash": "5b015d8c",
       "needsInterop": true
     },
-    "@angular/forms": {
-      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
-      "file": "@angular_forms.js",
-      "fileHash": "1b8b2a15",
+    "ng2-pdf-viewer": {
+      "src": "../../../../../../node_modules/ng2-pdf-viewer/fesm2022/ng2-pdf-viewer.mjs",
+      "file": "ng2-pdf-viewer.js",
+      "fileHash": "1dd43c65",
       "needsInterop": false
     }
   },

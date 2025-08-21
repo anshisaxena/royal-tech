@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  background-color: #F1F9FF;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -10,22 +10,34 @@
 
 .content-section {
   flex: 1;
-  background: white;
+  background:#F1F9FF;
   padding: 0;
   margin: 0;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;  /* Align content horizontally to the left */
+  align-items: flex-start;     /* Align content to the top */
   height: 100%;
   width: 100%;
+  margin-left: 30px;  /* Push the content further to the left */
 }
 
 .pdf-processor-placeholder {
-  width: 60%;
+  width: 50%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  max-width: 800px; /* Prevent it from being too wide */
+}
+
+.config-section {
+  width: 450px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px); /* Prevent config section from overflowing */
 }
 
 .pdf-viewer {
@@ -48,6 +60,36 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .content-section {
+    width: 100%;  /* Ensure it takes full width for smaller screens */
+    margin-left: 0; /* Remove the left margin on smaller screens */
+  }
+}
+
+@media (max-width: 1200px) {
+  .content-section {
+    flex-direction: column;  /* Stack the PDF Viewer and Config vertically for smaller screens */
+    gap: 20px;
+    height: auto;
+    width: 100%;
+    min-height: calc(100vh - 100px);
+  }
+
+  .config-section {
+    width: 100%;  /* Make config section take full width in column layout */
+    max-width: 500px;
+    align-self: center;
+    height: auto;
+    padding-left: 0;
+  }
+
+  .pdf-processor-placeholder {
+    height: 400px;
+    min-height: 400px;
+  }
+}
+
 @media (max-width: 768px) {
   .content-section {
     margin: 0;

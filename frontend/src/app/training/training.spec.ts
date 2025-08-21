@@ -1,23 +1,86 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { Header } from '../components/header/header';
+import { ActionButtons } from '../components/action-buttons/action-buttons';
+import { FileUploadService } from '../services/file-upload.service';
+import { PdfOverlayComponent } from '../components/pdf-overlay/pdf-overlay';
+import { PdfConfig } from '../components/pdf-config/pdf-config';
 
-import { Training } from './training';
+@Component({
+  selector: 'app-training',
+  standalone: true,
+  imports: [
+    Header,
+    ActionButtons,
+    NgIf,
+    PdfOverlayComponent,
+    PdfConfig
+  ],
+  templateUrl: './training.html',
+  styleUrls: ['./training.css']
+})
+export class Training implements OnInit, OnDestroy {
+  documentName: string = 'IMPORT';
+  uploadedFile: File | null = null;
+  fileURL: string | null = null;
+  showPDF: boolean = true; // Ensure PDF viewer is shown by default
 
-describe('Training', () => {
-  let component: Training;
-  let fixture: ComponentFixture<Training>;
+  originalData: any = {
+    InvoiceNo: 'E260302',
+    InvoiceDate: '08/07/2025',
+    ExporterName: 'TASTY BITE EATABLES LTD',
+    TotalGrossWeight: '24124.360'
+  };
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Training]
-    })
-    .compileComponents();
+  jsonData: any = {
+    InvoiceNo: 'E260302',
+    InvoiceDate: '08/07/2025',
+    ExporterName: 'TASTY BITE EATABLES LTD',
+    TotalGrossWeight: '24124.360'
+  };
 
-    fixture = TestBed.createComponent(Training);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  constructor(private fileService: FileUploadService) {}
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+  ngOnInit() {
+    this.uploadedFile = this.fileService.getFile();
+    if (this.uploadedFile) {
+      this.fileURL = URL.createObjectURL(this.uploadedFile);
+      this.documentName = this.uploadedFile.name;
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.fileURL) {
+      URL.revokeObjectURL(this.fileURL);
+      this.fileURL = null; // prevent accidental reuse
+    }
+  }
+
+  handleSearch(query: string) {
+    console.log('Search query:', query);
+  }
+
+  handleSubmit() {
+    console.log('Submit clicked');
+  }
+
+  handleSave() {
+    console.log('Save clicked');
+  }
+
+  handleNext() {
+    console.log('Next clicked');
+  }
+
+  handlePromptChange(prompt: string) {
+    console.log('Prompt changed:', prompt);
+  }
+
+  handleFieldConfigChange(config: any) {
+    console.log('Field config changed:', config);
+  }
+
+  handleActionTriggered(action: string) {
+    console.log('Action triggered:', action);
+  }
+}
