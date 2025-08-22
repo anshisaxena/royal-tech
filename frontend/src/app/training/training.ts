@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgIf, NgForOf } from '@angular/common'; // <-- import NgForOf
+import { NgIf, NgForOf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Header } from '../components/header/header';
 import { ActionButtons } from '../components/action-buttons/action-buttons';
 import { FileUploadService } from '../services/file-upload.service';
@@ -13,7 +14,8 @@ import { PdfConfig } from '../components/pdf-config/pdf-config';
     Header,
     ActionButtons,
     NgIf,
-    NgForOf,        // <-- required for *ngFor
+    NgForOf,
+    FormsModule,
     PdfOverlayComponent,
     PdfConfig
   ],
@@ -42,6 +44,8 @@ export class Training implements OnInit, OnDestroy {
 
   jsonData: any = { ...this.originalData };
 
+  currentImageIndex: number = 0;       // 0-based
+  currentImageIndexInput: number = 1;  // 1-based for input
 
   constructor(private fileService: FileUploadService) {}
 
@@ -67,6 +71,29 @@ export class Training implements OnInit, OnDestroy {
     return this.fileURLs.get(file)!;
   }
 
+  showImageByNumber(num: number) {
+    const index = num - 1;
+    if (index >= 0 && index < this.uploadedFiles.length) {
+      this.currentImageIndex = index;
+    } else {
+      console.warn('Invalid image number');
+    }
+  }
+
+  prevImage() {
+    if (this.currentImageIndex > 0) {
+      this.currentImageIndex--;
+      this.currentImageIndexInput = this.currentImageIndex + 1;
+    }
+  }
+
+  nextImage() {
+    if (this.currentImageIndex < this.uploadedFiles.length - 1) {
+      this.currentImageIndex++;
+      this.currentImageIndexInput = this.currentImageIndex + 1;
+    }
+  }
+
   ngOnDestroy() {
     this.fileURLs.forEach(url => URL.revokeObjectURL(url));
     this.fileURLs.clear();
@@ -75,8 +102,7 @@ export class Training implements OnInit, OnDestroy {
   handleSearch(query: string) { console.log('Search query:', query); }
   handleSubmit() { console.log('Submit clicked'); }
   handleSave() { console.log('Save clicked'); }
-  handleNext() {
-     console.log('Next clicked'); }
+  handleNext() { console.log('Next clicked'); }
   handlePromptChange(prompt: string) { console.log('Prompt changed:', prompt); }
   handleFieldConfigChange(config: any) { console.log('Field config changed:', config); }
   handleActionTriggered(action: string) { console.log('Action triggered:', action); }

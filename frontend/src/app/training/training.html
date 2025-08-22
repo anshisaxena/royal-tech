@@ -27,17 +27,26 @@
         </div>
       </ng-container>
 
-      <!-- Image Viewer with Overlay -->
+      <!-- Image Viewer with Manual Selection -->
       <ng-container *ngIf="fileType === 'image'">
-        <div class="images-scroll-container">
-          <div class="image-wrapper" *ngFor="let file of uploadedFiles">
-            <app-pdf-overlay
-              class="image-viewer"
-              [fileURL]="getFileURL(file)"
-              [fileObj]="file"
-              [originalData]="originalData"
-              [jsonData]="jsonData">
-            </app-pdf-overlay>
+        <div class="image-wrapper" *ngIf="uploadedFiles.length">
+          <app-pdf-overlay
+            class="image-viewer"
+            [fileURL]="getFileURL(uploadedFiles[currentImageIndex])"
+            [fileObj]="uploadedFiles[currentImageIndex]"
+            [originalData]="originalData"
+            [jsonData]="jsonData">
+          </app-pdf-overlay>
+
+          <!-- Image selector placed at the bottom -->
+          <div class="image-selector">
+            <button (click)="prevImage()" [disabled]="currentImageIndex === 0">Prev</button>
+            <label>Image:</label>
+            <input type="number" min="1" [max]="uploadedFiles.length"
+                   [(ngModel)]="currentImageIndexInput"
+                   (change)="showImageByNumber(currentImageIndexInput)">
+            <span>/ {{ uploadedFiles.length }}</span>
+            <button (click)="nextImage()" [disabled]="currentImageIndex === uploadedFiles.length - 1">Next</button>
           </div>
         </div>
       </ng-container>
