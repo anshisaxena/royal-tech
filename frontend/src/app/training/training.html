@@ -6,50 +6,56 @@
   <div class="content-section">
     <ng-container *ngIf="uploadedFiles.length; else placeholder">
 
-      <!-- PDF Viewer -->
-      <ng-container *ngIf="fileType === 'pdf' && showPDF">
-        <div class="pdf-processor-placeholder">
-          <app-pdf-overlay
-            class="pdf-viewer"
-            [fileURL]="getFileURL(uploadedFiles[0])"
-            [fileObj]="uploadedFiles[0]"
-            [originalData]="originalData"
-            [jsonData]="jsonData">
-          </app-pdf-overlay>
-        </div>
-
-        <div class="config-section">
-          <app-pdf-config
-            (promptChange)="handlePromptChange($event)"
-            (fieldConfigChange)="handleFieldConfigChange($event)"
-            (actionTriggered)="handleActionTriggered($event)">
-          </app-pdf-config>
-        </div>
-      </ng-container>
-
-      <!-- Image Viewer with Manual Selection -->
-      <ng-container *ngIf="fileType === 'image'">
-        <div class="image-wrapper" *ngIf="uploadedFiles.length">
-          <app-pdf-overlay
-            class="image-viewer"
-            [fileURL]="getFileURL(uploadedFiles[currentImageIndex])"
-            [fileObj]="uploadedFiles[currentImageIndex]"
-            [originalData]="originalData"
-            [jsonData]="jsonData">
-          </app-pdf-overlay>
-
-          <!-- Image selector placed at the bottom -->
-          <div class="image-selector">
-            <button (click)="prevImage()" [disabled]="currentImageIndex === 0">Prev</button>
-            <label>Image:</label>
-            <input type="number" min="1" [max]="uploadedFiles.length"
-                   [(ngModel)]="currentImageIndexInput"
-                   (change)="showImageByNumber(currentImageIndexInput)">
-            <span>/ {{ uploadedFiles.length }}</span>
-            <button (click)="nextImage()" [disabled]="currentImageIndex === uploadedFiles.length - 1">Next</button>
+      <!-- Viewer Section -->
+      <div class="viewer-section">
+        <!-- PDF Viewer -->
+        <ng-container *ngIf="fileType === 'pdf' && showPDF">
+          <div class="pdf-processor-placeholder">
+            <app-pdf-overlay
+              class="pdf-viewer"
+              [fileURL]="getFileURL(uploadedFiles[0])"
+              [fileObj]="uploadedFiles[0]"
+              [originalData]="originalData"
+              [jsonData]="jsonData"
+              [currentPage]="1">
+            </app-pdf-overlay>
           </div>
-        </div>
-      </ng-container>
+        </ng-container>
+
+        <!-- Image Viewer -->
+        <ng-container *ngIf="fileType === 'image'">
+          <div class="image-wrapper" *ngIf="uploadedFiles.length">
+            <app-pdf-overlay
+              class="image-viewer"
+              [fileURL]="getFileURL(uploadedFiles[currentImageIndex])"
+              [fileObj]="uploadedFiles[currentImageIndex]"
+              [originalData]="originalData"
+              [jsonData]="jsonData"
+              [currentPage]="currentImageIndex + 1">
+            </app-pdf-overlay>
+
+            <!-- Image selector toolbar -->
+            <div class="image-selector">
+              <button (click)="prevImage()" [disabled]="currentImageIndex === 0">Prev</button>
+              <label>Image:</label>
+              <input type="number" min="1" [max]="uploadedFiles.length"
+                     [(ngModel)]="currentImageIndexInput"
+                     (change)="showImageByNumber(currentImageIndexInput)">
+              <span>/ {{ uploadedFiles.length }}</span>
+              <button (click)="nextImage()" [disabled]="currentImageIndex === uploadedFiles.length - 1">Next</button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Config Section -->
+      <div class="config-section">
+        <app-pdf-config
+          (promptChange)="handlePromptChange($event)"
+          (fieldConfigChange)="handleFieldConfigChange($event)"
+          (actionTriggered)="handleActionTriggered($event)">
+        </app-pdf-config>
+      </div>
 
     </ng-container>
 

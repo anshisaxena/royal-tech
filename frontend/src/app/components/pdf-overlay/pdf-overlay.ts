@@ -18,10 +18,11 @@ import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
   styleUrls: ['./pdf-overlay.css']
 })
 export class PdfOverlayComponent implements OnInit {
-  @Input() fileURL: string | null = null;   // Blob/object URL
-  @Input() fileObj: File | null = null;     // File object to detect type
+  @Input() fileURL: string | null = null;
+  @Input() fileObj: File | null = null;
   @Input() originalData: any;
   @Input() jsonData: any;
+  @Input() currentPage: number = 1; // for PDFs
 
   fieldMapping: any[] = [];
   editedFields = new Set<string>();
@@ -33,44 +34,72 @@ export class PdfOverlayComponent implements OnInit {
   constructor(private mappingService: MappingService) {}
 
   ngOnInit() {
-    if (this.fileObj) {
-      this.isImage = this.fileObj.type.startsWith('image/');
-    }
+    this.isImage = this.fileObj?.type.startsWith('image/') || false;
+    this.updatePageFields();
+  }
 
-    this.fieldMapping = this.mappingService.getMapping('godrej');
+  /** Called when PDF loads */
+  onPdfLoad(pdf: any) {
+    this.updatePdfScale(pdf);
+  }
 
-    if (this.jsonData) {
-      this.fieldMapping.forEach(field => {
-        this.tempValues[field.key] = this.jsonData[field.key] || '';
+  /** Called when PDF page changes */
+  onPageChange(pageNo: number) {
+    this.currentPage = pageNo;
+    this.updatePageFields();
+    setTimeout(() => this.updatePdfScale(), 100);
+  }
+
+  /** Called when image finishes loading */
+  onImageLoad(img: HTMLImageElement) {
+    if (!img || !this.fieldMapping.length) return;
+    this.scale = img.clientWidth / img.naturalWidth;
+    this.updatePageFields(); // refresh overlay positions
+  }
+
+  /** Initialize fieldMapping and tempValues per page */
+  updatePageFields() {
+    const allFields = this.mappingService.getMapping('godrej') || [];
+    const pageNo = this.isImage ? this.currentPage : this.currentPage;
+    this.fieldMapping = allFields.filter(f => f.pageNo === pageNo);
+
+    // Initialize tempValues
+    this.fieldMapping.forEach(field => {
+      const pageKey = `page ${pageNo}`;
+      const pageData = this.jsonData?.[pageKey] || {};
+      this.tempValues[field.key] = pageData[field.key] || '';
+    });
+  }
+
+  /** Update PDF scale after load */
+  updatePdfScale(pdf?: any) {
+    if (this.isImage) return;
+
+    if (pdf) {
+      const page = pdf.getPage(this.currentPage);
+      page.then((p: any) => {
+        const viewport = p.getViewport({ scale: 1 });
+        const container = document.querySelector('.pdf-viewer-container') as HTMLElement;
+        if (container && viewport) {
+          this.scale = container.clientWidth / viewport.width;
+        }
       });
     }
   }
 
-  onPdfLoad(pdf: any) {
-    if (this.isImage) return; // skip scaling for images
-
-    const page = pdf.getPage(1);
-    page.then((p: any) => {
-      const viewport = p.getViewport({ scale: 1 });
-      const canvas = document.querySelector('.ng2-pdf-viewer-container canvas') as HTMLCanvasElement;
-      if (canvas) {
-        this.scale = canvas.clientWidth / viewport.width;
-      }
-    });
-  }
-
+  /** Update jsonData and editedFields on blur */
   onBlur(key: string) {
-    const newValue = this.tempValues[key];
+    const pageKey = `page ${this.currentPage}`;
+    const pageData = this.jsonData?.[pageKey] || {};
+
+    pageData[key] = this.tempValues[key];
+    this.jsonData[pageKey] = pageData;
+
     const originalValue = this.originalData?.[key];
-
-    if (this.jsonData) {
-      this.jsonData[key] = newValue;
-
-      if (newValue !== originalValue) {
-        this.editedFields.add(key);
-      } else {
-        this.editedFields.delete(key);
-      }
+    if (this.tempValues[key] !== originalValue) {
+      this.editedFields.add(key);
+    } else {
+      this.editedFields.delete(key);
     }
   }
 }

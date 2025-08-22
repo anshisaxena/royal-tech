@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgIf, NgForOf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Header } from '../components/header/header';
 import { ActionButtons } from '../components/action-buttons/action-buttons';
@@ -14,7 +14,6 @@ import { PdfConfig } from '../components/pdf-config/pdf-config';
     Header,
     ActionButtons,
     NgIf,
-    NgForOf,
     FormsModule,
     PdfOverlayComponent,
     PdfConfig

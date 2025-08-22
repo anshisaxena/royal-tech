@@ -110,8 +110,8 @@ export class FileUploadComponent {
 
   downloadTemplate() {
     const link = document.createElement('a');
-    link.href = 'assets/resume.pdf';
-    link.download = 'resume.pdf';
+    link.href = 'assets/Invoice.pdf';
+    link.download = 'Invoice.pdf';
     link.click();
   }
 

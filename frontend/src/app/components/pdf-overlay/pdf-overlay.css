@@ -1,9 +1,9 @@
 .pdf-viewer-container {
   width: 100%;
-  height: 800px; 
+  height: 800px;
+  position: relative;
   overflow: auto;
   border: 1px solid #ccc;
-  position: relative;
 }
 
 .pdf-scroll-layer {
@@ -12,9 +12,16 @@
   height: 100%;
 }
 
-.pdf-viewer {
+.image-wrapper {
+  position: relative; /* important for image overlays */
   width: 100%;
-  height: 100%;
+  display: inline-block;
+}
+
+.image-viewer {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .overlay-layer {
@@ -23,7 +30,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 2;
+  z-index: 10;
   pointer-events: none;
 }
 
@@ -31,32 +38,26 @@
   position: absolute;
   font-size: 10px;
   padding: 2px 4px;
+  border-radius: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-radius: 4px;
-  pointer-events: auto;
+  pointer-events: auto; /* allow input interaction */
 }
 
 .red-dashed {
   border: 2px dashed red;
-  background-color: rgba(255, 0, 0, 0.15);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background-color: rgba(255,0,0,0.15);
 }
 
 input.blue-border {
   border: 2px solid blue;
-  background-color: rgba(0, 0, 255, 0.1);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background-color: rgba(0,0,255,0.1);
   color: black;
 }
 
 input.yellow-border {
   border: 2px solid orange;
-  background-color: rgba(255, 255, 0, 0.2);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background-color: rgba(255,255,0,0.2);
   color: black;
 }

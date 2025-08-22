@@ -1,49 +1,53 @@
 <div class="pdf-viewer-container">
-  <div class="pdf-scroll-layer">
-    <!-- PDF or Image -->
-    <ng-container *ngIf="fileURL">
-      <pdf-viewer
-        *ngIf="!isImage"
-        [src]="fileURL"
-        [render-text]="true"
-        [show-all]="true"
-        [zoom]="1"
-        (after-load-complete)="onPdfLoad($event)"
-        style="width: 100%; height: 100%;">
-      </pdf-viewer>
 
-      <img
-        *ngIf="isImage"
-        [src]="fileURL | safeUrl"
-        alt="Uploaded Image"
-        style="width: 100%; height: auto;"
-      />
-    </ng-container>
+  <!-- PDF Viewer -->
+  <ng-container *ngIf="fileURL && !isImage">
+    <pdf-viewer
+      [src]="fileURL"
+      [render-text]="true"
+      [show-all]="true"
+      [zoom]="1"
+      (after-load-complete)="onPdfLoad($event)"
+      (pageChange)="onPageChange($event)"
+      style="width:100%; height:100%;">
+    </pdf-viewer>
+  </ng-container>
 
-    <!-- Overlay Layer -->
-    <div class="overlay-layer">
-      <ng-container *ngFor="let field of fieldMapping">
-        <div class="box red-dashed"
-             [style.top.px]="field.top * scale"
-             [style.left.px]="field.left * scale"
-             [style.width.px]="field.width * scale"
-             [style.height.px]="field.height * 0.5 * scale">
-          {{ originalData?.[field.key] }}
-        </div>
-
-        <input type="text"
-               class="box"
-               [ngClass]="{
-                 'blue-border': !editedFields.has(field.key),
-                 'yellow-border': editedFields.has(field.key)
-               }"
-               [(ngModel)]="tempValues[field.key]"
-               (blur)="onBlur(field.key)"
-               [style.top.px]="field.top * scale"
-               [style.left.px]="(field.left + field.width + 5) * scale"
-               [style.width.px]="field.width * scale"
-               [style.height.px]="field.height * 0.5 * scale" />
-      </ng-container>
+  <!-- Image Viewer -->
+  <ng-container *ngIf="fileURL && isImage">
+    <div class="image-wrapper">
+      <img #imgRef
+           [src]="fileURL | safeUrl"
+           alt="Uploaded Image"
+           class="image-viewer"
+           (load)="onImageLoad(imgRef)" />
     </div>
+  </ng-container>
+
+  <!-- Overlay Layer -->
+  <div class="overlay-layer">
+    <ng-container *ngFor="let field of fieldMapping">
+      <div class="box red-dashed"
+           [style.top.px]="field.top * scale"
+           [style.left.px]="field.left * scale"
+           [style.width.px]="field.width * scale"
+           [style.height.px]="field.height * scale">
+        {{ originalData?.[field.key] }}
+      </div>
+
+      <input type="text"
+             class="box"
+             [ngClass]="{
+               'blue-border': !editedFields.has(field.key),
+               'yellow-border': editedFields.has(field.key)
+             }"
+             [(ngModel)]="tempValues[field.key]"
+             (blur)="onBlur(field.key)"
+             [style.top.px]="field.top * scale"
+             [style.left.px]="(field.left + field.width + 5) * scale"
+             [style.width.px]="field.width * scale"
+             [style.height.px]="field.height * scale" />
+    </ng-container>
   </div>
+
 </div>

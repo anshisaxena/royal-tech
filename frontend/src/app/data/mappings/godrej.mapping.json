@@ -1,12 +1,100 @@
 [
-  { "key": "IRN No", "top": 140, "left": 100, "width": 200, "height": 30 },
-  { "key": "Exporter", "top":180, "left":50, "width": 200, "height": 30 },
-  { "key": "Tax Invoice No", "top": 600, "left": 200, "width": 200, "height": 30 },
-  { "key": "Tax Invoice Date", "top": 700, "left": 200, "width": 150, "height": 30 },
-  { "key": "GST No", "top": 235, "left":280, "width": 100, "height": 30 },
-  { "key": "Consignee", "top": 800, "left": 600, "width": 250, "height": 30 },
-  { "key": "State of Origin", "top": 800, "left": 600, "width": 200, "height": 30 },
-  { "key": "District of Origin", "top": 1000, "left": 600, "width": 200, "height": 30 },
-  { "key": "Buyer/Applicant", "top": 440, "left": 425, "width": 100, "height": 30 },
-  { "key": "Commission Payable", "top": 900, "left": 600, "width": 200, "height": 30 }
+  {
+    "pageNo": 1,
+    "key": "IRN No",
+    "top": 50,
+    "left": 400,
+    "width": 300,
+    "height": 20
+  },
+  {
+    "pageNo": 1,
+    "key": "Exporter",
+    "top": 80,
+    "left": 100,
+    "width": 400,
+    "height": 20
+  },
+  {
+    "pageNo": 1,
+    "key": "Tax Invoice No",
+    "top": 110,
+    "left": 100,
+    "width": 200,
+    "height": 20
+  },
+  {
+    "pageNo": 1,
+    "key": "Tax Invoice Date",
+    "top": 110,
+    "left": 320,
+    "width": 150,
+    "height": 20
+  },
+
+  {
+    "pageNo": 2,
+    "key": "GST No",
+    "top": 50,
+    "left": 100,
+    "width": 250,
+    "height": 20
+  },
+  {
+    "pageNo": 2,
+    "key": "Consignee",
+    "top": 80,
+    "left": 100,
+    "width": 300,
+    "height": 20
+  },
+  {
+    "pageNo": 2,
+    "key": "State of Origin",
+    "top": 110,
+    "left": 100,
+    "width": 200,
+    "height": 20
+  },
+  {
+    "pageNo": 2,
+    "key": "District of Origin",
+    "top": 140,
+    "left": 100,
+    "width": 200,
+    "height": 20
+  },
+
+  {
+    "pageNo": 3,
+    "key": "Consignee",
+    "top": 50,
+    "left": 100,
+    "width": 300,
+    "height": 20
+  },
+  {
+    "pageNo": 3,
+    "key": "Buyer/Applicant",
+    "top": 80,
+    "left": 100,
+    "width": 300,
+    "height": 20
+  },
+  {
+    "pageNo": 3,
+    "key": "Tax Invoice No",
+    "top": 110,
+    "left": 100,
+    "width": 200,
+    "height": 20
+  },
+  {
+    "pageNo": 3,
+    "key": "Commission Payable",
+    "top": 140,
+    "left": 100,
+    "width": 150,
+    "height": 20
+  }
 ]
