@@ -12,6 +12,7 @@
           <app-pdf-overlay
             class="pdf-viewer"
             [fileURL]="getFileURL(uploadedFiles[0])"
+            [fileObj]="uploadedFiles[0]"
             [originalData]="originalData"
             [jsonData]="jsonData">
           </app-pdf-overlay>
@@ -26,11 +27,17 @@
         </div>
       </ng-container>
 
-      <!-- Image Viewer -->
+      <!-- Image Viewer with Overlay -->
       <ng-container *ngIf="fileType === 'image'">
         <div class="images-scroll-container">
           <div class="image-wrapper" *ngFor="let file of uploadedFiles">
-            <img [src]="getFileURL(file)" [alt]="file.name" class="image-viewer" />
+            <app-pdf-overlay
+              class="image-viewer"
+              [fileURL]="getFileURL(file)"
+              [fileObj]="file"
+              [originalData]="originalData"
+              [jsonData]="jsonData">
+            </app-pdf-overlay>
           </div>
         </div>
       </ng-container>
