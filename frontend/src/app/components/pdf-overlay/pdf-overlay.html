@@ -50,4 +50,13 @@
     </ng-container>
   </div>
 
+  <!-- ✅ Selection Overlay for new field creation -->
+  <div class="selection-box"
+       *ngIf="selection"
+       [style.top.px]="selection.top"
+       [style.left.px]="selection.left"
+       [style.width.px]="selection.width"
+       [style.height.px]="selection.height">
+  </div>
+
 </div>

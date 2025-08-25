@@ -61,3 +61,12 @@ input.yellow-border {
   background-color: rgba(255,255,0,0.2);
   color: black;
 }
+
+/* ✅ New selection box style */
+.selection-box {
+  position: absolute;
+  border: 2px dashed #007bff;
+  background-color: rgba(0, 123, 255, 0.2);
+  pointer-events: none; /* prevent blocking input */
+  z-index: 9999;
+}
