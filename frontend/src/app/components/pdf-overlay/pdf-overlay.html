@@ -48,6 +48,24 @@
              [style.width.px]="field.width * scale"
              [style.height.px]="field.height * scale" />
     </ng-container>
+
+    <!-- Dynamic inputs for keys present in jsonData but not in fieldMapping (e.g., OCR/CSV) -->
+    <ng-container *ngFor="let key of getAllKeys()">
+      <ng-container *ngIf="!isInFieldMapping(key)">
+        <input type="text"
+               class="box"
+               [ngClass]="{
+                 'blue-border': !editedFields.has(key),
+                 'yellow-border': editedFields.has(key)
+               }"
+               [(ngModel)]="tempValues[key]"
+               (blur)="onBlur(key)"
+               [style.top.px]="getFieldTop(key)"
+               [style.left.px]="getFieldLeft(key)"
+               [style.width.px]="getFieldWidth(key)"
+               [style.height.px]="getFieldHeight(key)" />
+      </ng-container>
+    </ng-container>
   </div>
 
   <!-- ✅ Selection Overlay for new field creation -->

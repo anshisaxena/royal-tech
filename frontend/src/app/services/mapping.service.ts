@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as Papa from 'papaparse';
+import { CsvService } from './csv.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class MappingService {
     { pageNo: 3, key: 'Commission Payable', top: 140, left: 100, width: 150, height: 20 }
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private csvService: CsvService) {}
 
   /** Load JSON file from assets */
   async loadJson(fileName: string): Promise<any[]> {
@@ -120,5 +121,76 @@ export class MappingService {
     });
 
     return newEntries;
+  }
+
+  /**
+   * Use CSV to find intersecting entries for an image selection box
+   */
+  async findTextInCsvBox(
+    fileName: string,
+    selection: number[], // [left, top, right, bottom] in natural image coords
+    pageNo: number,
+    jsonData: any,
+    tempValues: { [key: string]: string }
+  ): Promise<any[]> {
+    try {
+      const csvPath = `assets/csv/${fileName}.csv`;
+      const csvText = await this.http
+        .get(csvPath, { responseType: 'text' })
+        .toPromise();
+
+      if (!csvText) return [];
+
+      const resultsByFile = this.csvService.parseCsvAndFindIntersections(csvText, selection);
+      // Flatten and filter by file name if possible
+      let rows: any[] = Object.values(resultsByFile).flat();
+      if (!rows.length) return [];
+
+      const baseName = fileName.replace(/\.[^/.]+$/, '');
+      rows = rows.filter(r => {
+        const rFile = (r.fileName || '').toString();
+        const rBase = rFile.replace(/\.[^/.]+$/, '');
+        return rBase === baseName || rFile.includes(baseName);
+      });
+
+      if (!rows.length) return [];
+
+      const newEntries = rows.map(row => {
+        const left = parseFloat(row.leftX);
+        const top = parseFloat(row.topY);
+        const right = parseFloat(row.rightX);
+        const bottom = parseFloat(row.bottomY);
+        return {
+          pageNo,
+          key: (row.Name || row.index || `field_${Date.now()}`) as string,
+          value: (row.Name || '') as string,
+          top,
+          left,
+          width: right - left,
+          height: bottom - top
+        };
+      });
+
+      // Add to mappings if not already present
+      newEntries.forEach(entry => {
+        const exists = this.mappings.some(
+          m => m.key === entry.key && m.pageNo === entry.pageNo
+        );
+        if (!exists) this.mappings.push(entry);
+      });
+
+      // Add to jsonData and tempValues for frontend display
+      newEntries.forEach(entry => {
+        const pageKey = `page ${entry.pageNo}`;
+        if (!jsonData[pageKey]) jsonData[pageKey] = {};
+        jsonData[pageKey][entry.key] = entry.value;
+        tempValues[entry.key] = entry.value;
+      });
+
+      return newEntries;
+    } catch (err) {
+      console.warn('CSV lookup failed', err);
+      return [];
+    }
   }
 }

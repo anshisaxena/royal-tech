@@ -139,13 +139,32 @@ export class PdfOverlayComponent implements OnInit {
       const imgElement = document.querySelector('.image-viewer') as HTMLImageElement;
       if (!imgElement) return;
 
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d')!;
+      // Compute selection in natural image coordinates
       const sx = box.left * this.ocrScaleX;
       const sy = box.top * this.ocrScaleY;
       const sw = box.width * this.ocrScaleX;
       const sh = box.height * this.ocrScaleY;
+      const selectionRect = [sx, sy, sx + sw, sy + sh];
 
+      const fileName = this.fileObj ? this.fileObj.name.split('.')[0] : 'file1';
+      // Try CSV-based lookup first
+      const csvResults = await this.mappingService.findTextInCsvBox(
+        fileName,
+        selectionRect,
+        pageNo,
+        this.jsonData,
+        this.tempValues
+      );
+
+      if (csvResults.length > 0) {
+        this.updatePageFields();
+        this.selection = null;
+        return;
+      }
+
+      // Fallback to OCR if CSV had no matches
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
       canvas.width = sw;
       canvas.height = sh;
       ctx.drawImage(imgElement, sx, sy, sw, sh, 0, 0, sw, sh);
@@ -195,6 +214,10 @@ export class PdfOverlayComponent implements OnInit {
     }
 
     this.selection = null;
+  }
+
+  isInFieldMapping(key: string): boolean {
+    return this.fieldMapping.some(f => f.key === key);
   }
 
   // ------------------ Overlay positioning helpers ------------------
