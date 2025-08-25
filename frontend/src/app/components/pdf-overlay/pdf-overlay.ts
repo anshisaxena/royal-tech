@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { MappingService } from '../../services/mapping.service';
+import { CsvService } from '../../services/csv.service';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import Tesseract from 'tesseract.js';
 
@@ -40,7 +41,10 @@ export class PdfOverlayComponent implements OnInit {
   private startX = 0;
   private startY = 0;
 
-  constructor(private mappingService: MappingService) {}
+  constructor(
+    private mappingService: MappingService,
+    private csvService: CsvService
+  ) {}
 
   ngOnInit() {
     this.isImage = this.fileObj?.type.startsWith('image/') || false;
@@ -139,6 +143,43 @@ export class PdfOverlayComponent implements OnInit {
       const imgElement = document.querySelector('.image-viewer') as HTMLImageElement;
       if (!imgElement) return;
 
+      // Try CSV-based intersection first
+      try {
+        const sx = box.left * this.ocrScaleX;
+        const sy = box.top * this.ocrScaleY;
+        const sw = box.width * this.ocrScaleX;
+        const sh = box.height * this.ocrScaleY;
+
+        const selectionNatural = [sx, sy, sx + sw, sy + sh];
+        const csvAssetPath = `assets/csv/file${pageNo}.csv`;
+        const csvText = await fetch(csvAssetPath).then(r => r.text());
+        const byFile = this.csvService.parseCsvAndFindIntersections(csvText, selectionNatural);
+        const rows = Object.values(byFile).flat();
+
+        if (rows.length > 0) {
+          const pageKey = `page ${pageNo}`;
+          if (!this.jsonData[pageKey]) this.jsonData[pageKey] = {};
+
+          rows.forEach((row: any) => {
+            const key = String(row.Name ?? row.index ?? `field_${Date.now()}`);
+            const leftDisp = parseFloat(row.leftX) / this.ocrScaleX;
+            const topDisp = parseFloat(row.topY) / this.ocrScaleY;
+            const widthDisp = (parseFloat(row.rightX) - parseFloat(row.leftX)) / this.ocrScaleX;
+            const heightDisp = (parseFloat(row.bottomY) - parseFloat(row.topY)) / this.ocrScaleY;
+
+            this.jsonData[pageKey][key] = String(row.Name ?? '');
+            this.tempValues[key] = String(row.Name ?? '');
+            this.ocrSelections[key] = { top: topDisp, left: leftDisp, width: widthDisp, height: heightDisp };
+          });
+
+          this.selection = null;
+          return;
+        }
+      } catch (e) {
+        // If CSV fetch/parse fails or no rows, fall back to OCR
+      }
+
+      // Fallback to OCR if CSV did not produce any result
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d')!;
       const sx = box.left * this.ocrScaleX;
@@ -221,5 +262,10 @@ export class PdfOverlayComponent implements OnInit {
   getFieldHeight(key: string): number {
     const field = this.fieldMapping.find(f => f.key === key);
     return field ? field.height * this.scale : (this.ocrSelections[key]?.height ?? 30);
+  }
+
+  // Helper for template: check if a key already exists in predefined mapping
+  isMappedKey(key: string): boolean {
+    return this.fieldMapping.some(f => f.key === key);
   }
 }
