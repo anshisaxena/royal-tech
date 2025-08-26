@@ -29,9 +29,11 @@ export class CsvService {
 
   parseCsvAndFindIntersections(
     csvContent: string,
-    selection: number[]
+    selection: number[],
+    opts?: { pageNo?: number; fileName?: string; expand?: number }
   ): { [fileName: string]: CsvRow[] } {
     const resultsByFile: { [fileName: string]: CsvRow[] } = {};
+    const expand = opts?.expand ?? 0; // tolerance pixels
 
     const parsed = Papa.parse(csvContent, {
       header: true,
@@ -44,13 +46,23 @@ export class CsvService {
       const topY = parseFloat(row.topY);
       const rightX = parseFloat(row.rightX);
       const bottomY = parseFloat(row.bottomY);
+      const rowPage = row.pageNo !== undefined && row.pageNo !== '' ? parseInt(row.pageNo, 10) : undefined;
 
       if (
         !isNaN(leftX) &&
         !isNaN(topY) &&
         !isNaN(rightX) &&
         !isNaN(bottomY) &&
-        this.rectanglesIntersect([leftX, topY, rightX, bottomY], selection)
+        // optional page filter
+        (opts?.pageNo === undefined || rowPage === undefined || rowPage === opts.pageNo) &&
+        // optional filename filter
+        (opts?.fileName === undefined || (row.fileName || '').toString() === opts.fileName) &&
+        this.rectanglesIntersect([
+          leftX - expand,
+          topY - expand,
+          rightX + expand,
+          bottomY + expand
+        ], selection)
       ) {
         const fileName = row.fileName || 'unknown_file';
         if (!resultsByFile[fileName]) {

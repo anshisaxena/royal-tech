@@ -11,15 +11,15 @@ export class MappingService {
   private mappings: any[] = [
     { pageNo: 1, key: 'IRN No', top: 335, left:240, width: 500, height: 22 },
     { pageNo: 1, key: 'Exporter', top: 420, left: 120, width: 400, height: 20 },
-    { pageNo: 1, key: 'Tax Invoice No', top: 550, left: 120, width: 200, height: 20 },
+    { pageNo: 1, key: 'Tax Invoice No', top: 1150, left: 1350, width: 200, height: 25 },
     { pageNo: 1, key: 'Tax Invoice Date', top: 1095, left: 1350, width: 150, height: 25 },
     { pageNo: 2, key: 'GST No', top: 276, left: 440, width: 250, height: 20 },
     { pageNo: 2, key: 'Consignee', top: 80, left: 100, width: 300, height: 20 },
     { pageNo: 2, key: 'State of Origin', top: 500, left: 300, width: 200, height: 20 },
     { pageNo: 2, key: 'District of Origin', top: 525, left: 300, width: 200, height: 20 },
-    { pageNo: 3, key: 'Consignee', top: 50, left: 100, width: 120, height: 20 },
-    { pageNo: 3, key: 'Buyer/Applicant', top: 80, left: 100, width: 120, height: 20 },
-    { pageNo: 3, key: 'Tax Invoice No', top: 110, left: 100, width: 200, height: 20 },
+    { pageNo: 3, key: 'Consignee', top: 322, left: 110, width: 120, height: 20 },
+    { pageNo: 3, key: 'Buyer/Applicant', top: 322, left: 480, width: 120, height: 15 },
+    { pageNo: 3, key: 'Tax Invoice No', top: 325, left: 600, width: 200, height: 15 },
     { pageNo: 3, key: 'Commission Payable', top: 140, left: 100, width: 150, height: 20 }
   ];
 

@@ -70,3 +70,15 @@ input.yellow-border {
   pointer-events: none; /* prevent blocking input */
   z-index: 9999;
 }
+
+/* Red label text overlay */
+.label-red {
+  position: absolute;
+  color: #ff0000;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 2px 4px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10000;
+}

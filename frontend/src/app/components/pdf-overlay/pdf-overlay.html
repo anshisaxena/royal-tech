@@ -48,6 +48,19 @@
              [style.width.px]="field.width * scale"
              [style.height.px]="field.height * scale" />
     </ng-container>
+
+    <!-- Red labels over the PDF/image for each selection result on current page -->
+    <ng-container *ngFor="let grp of csvSelectionResults">
+      <div *ngIf="grp.pageNo === currentPage"
+           class="label-red"
+           [style.top.px]="grp.box.top * scale - 18"
+           [style.left.px]="grp.box.left * scale">
+        <ng-container *ngIf="grp.parsed; else rawText">
+          {{ grp.parsed.key }}: {{ grp.parsed.value }}
+        </ng-container>
+        <ng-template #rawText>{{ grp.text }}</ng-template>
+      </div>
+    </ng-container>
   </div>
 
   <!-- ✅ Selection Overlay for new field creation -->
@@ -57,6 +70,36 @@
        [style.left.px]="selection.left"
        [style.width.px]="selection.width"
        [style.height.px]="selection.height">
+  </div>
+
+  <!-- Persisted selection boxes (normalized → scaled) -->
+  <ng-container *ngFor="let b of drawnBoxes">
+    <div class="selection-box"
+         *ngIf="b.pageNo === currentPage"
+         [style.top.px]="b.top * scale"
+         [style.left.px]="b.left * scale"
+         [style.width.px]="(b.right - b.left) * scale"
+         [style.height.px]="(b.bottom - b.top) * scale">
+    </div>
+  </ng-container>
+
+  <!-- Selection results (from image1.csv) -->
+  <div *ngIf="csvSelectionResults.length" class="selection-results">
+    <h4>Selection results</h4>
+    <div *ngFor="let grp of csvSelectionResults">
+      <div>Page {{ grp.pageNo }} | L {{ grp.box.left | number:'1.0-0' }}, T {{ grp.box.top | number:'1.0-0' }}, R {{ grp.box.right | number:'1.0-0' }}, B {{ grp.box.bottom | number:'1.0-0' }}</div>
+      <div *ngIf="grp.text">Text: {{ grp.text }}</div>
+      <div *ngIf="grp.parsed"><strong>{{ grp.parsed.key }}:</strong> {{ grp.parsed.value }}</div>
+      <div *ngIf="grp.pairs?.length">
+        <div><strong>Resolved from CSV rows:</strong></div>
+        <ul>
+          <li *ngFor="let p of grp.pairs">{{ p.key }}: {{ p.value }}</li>
+        </ul>
+      </div>
+      <ul>
+        <li *ngFor="let r of grp.rows">{{ r.Name }} ({{ r.leftX }}, {{ r.topY }}, {{ r.rightX }}, {{ r.bottomY }})</li>
+      </ul>
+    </div>
   </div>
 
 </div>
