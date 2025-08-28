@@ -151,12 +151,19 @@ export class PdfOverlayComponent implements OnInit {
     const pageNo = this.currentPage;
 
     if (this.isImage) {
-      // Normalize to unscaled coordinates
+      // --- Expand selection box for better label/value accuracy ---
+      // Give more margin from the top and less to the left
+      const expandTop = 18;   // pixels (image coordinates)
+      const expandLeft = 4;   // pixels (image coordinates)
+      const expandRight = 2;  // pixels (image coordinates)
+      const expandBottom = 2; // pixels (image coordinates)
+
+      // Normalize to unscaled coordinates and expand
       const selBox = {
-        left: box.left / this.scale,
-        top: box.top / this.scale,
-        right: (box.left + box.width) / this.scale,
-        bottom: (box.top + box.height) / this.scale
+        left: Math.max(0, (box.left - expandLeft) / this.scale),
+        top: Math.max(0, (box.top - expandTop) / this.scale),
+        right: (box.left + box.width + expandRight) / this.scale,
+        bottom: (box.top + box.height + expandBottom) / this.scale
       };
 
       // Persist the selection box for visual display
@@ -225,15 +232,59 @@ export class PdfOverlayComponent implements OnInit {
           const rgt = parseFloat((bestRow as any).rightX);
           const btm = parseFloat((bestRow as any).bottomY);
           const jsonPage = pageNo - 1;
-          const inside = words
-            .filter((w: any) =>
-              +w.pageNo === jsonPage &&
-              +w.leftX >= l && +w.topY >= t && +w.rightX <= rgt && +w.bottomY <= btm
-            )
-            .sort((a: any, b: any) => +a.leftX - +b.leftX);
-          const value = inside.map((w: any) => w.text).join(' ').trim();
-          const key = (bestRow as any).Name || 'Field';
+          let key = (bestRow as any).Name || 'Field';
+          let inside;
+          if (key && key.toLowerCase().includes('exporter')) {
+            // For Exporter, restrict to a small region just below the IRN box
+            // Find the IRN box
+            const irnRow = rows.find(r =>
+              (r as any).Name && String((r as any).Name).toLowerCase().includes('irn')
+            );
+            if (irnRow) {
+              const irnBottom = parseFloat((irnRow as any).bottomY);
+              const irnLeft = parseFloat((irnRow as any).leftX);
+              const irnRight = parseFloat((irnRow as any).rightX);
+              // Only take words between IRN bottom and Exporter bottom, and horizontally overlapping IRN/Exporter
+              inside = words
+                .filter((w: any) =>
+                  +w.pageNo === jsonPage &&
+                  +w.leftX >= Math.min(irnLeft, l) &&
+                  +w.rightX <= Math.max(irnRight, rgt) &&
+                  +w.topY >= irnBottom &&
+                  +w.bottomY <= btm
+                )
+                .sort((a: any, b: any) => +a.topY - +b.topY || +a.leftX - +b.leftX);
+            } else {
+              // fallback: just use Exporter box
+              inside = words
+                .filter((w: any) =>
+                  +w.pageNo === jsonPage &&
+                  +w.leftX >= l &&
+                  +w.topY >= t &&
+                  +w.rightX <= rgt &&
+                  +w.bottomY <= btm
+                )
+                .sort((a: any, b: any) => +a.topY - +b.topY || +a.leftX - +b.leftX);
+            }
+          } else {
+            // Default logic for other fields
+            inside = words
+              .filter((w: any) =>
+                +w.pageNo === jsonPage &&
+                +w.leftX >= l &&
+                +w.topY >= t &&
+                +w.rightX <= rgt &&
+                +w.bottomY <= btm
+              )
+              .sort((a: any, b: any) => +a.topY - +b.topY || +a.leftX - +b.leftX);
+          }
+          let value = inside.map((w: any) => w.text).join(' ').trim();
+
+          // --- Correction for IRN, GST, Exporter: strip label from value if present ---
           if (key && value) {
+            // Remove label and colon from value if present at start (case-insensitive)
+            const labelPattern = new RegExp('^' + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*:?\\s*', 'i');
+            value = value.replace(labelPattern, '').trim();
             parsed = { key, value };
             labelText = key;
           }

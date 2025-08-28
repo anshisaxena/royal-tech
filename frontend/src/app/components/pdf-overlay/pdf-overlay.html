@@ -64,8 +64,8 @@
     <ng-container *ngFor="let grp of csvSelectionResults">
       <div *ngIf="grp.pageNo === currentPage"
            class="label-red"
-           [style.top.px]="grp.box.top * scale - 18"
-           [style.left.px]="grp.box.left * scale">
+           [style.top.px]="grp.box.top * scale"
+           [style.left.px]="grp.box.left * scale + 8">
         <ng-container *ngIf="grp.parsed; else rawText">
           {{ grp.parsed.key }}: {{ grp.parsed.value }}
         </ng-container>

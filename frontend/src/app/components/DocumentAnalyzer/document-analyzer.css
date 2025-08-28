@@ -1,0 +1,25 @@
+.prompt-box {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.prompt-box input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.prompt-box button {
+  padding: 6px 12px;
+  background: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.prompt-box button:hover {
+  background: #005fa3;
+}
+

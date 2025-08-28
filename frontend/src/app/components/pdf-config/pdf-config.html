@@ -3,8 +3,12 @@
     <div class="prompt-section">
         <div class="prompt-input-container">
             <label class="prompt-label">PROMPT</label>
-            <input type="text" class="prompt-input" [(ngModel)]="promptText" (ngModelChange)="onPromptChange($event)"
-                placeholder="Extract Income Tax ID Number">
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input type="text" class="prompt-input" [(ngModel)]="promptText" 
+                    (ngModelChange)="onPromptChange($event)"
+                    placeholder="Extract Income Tax ID Number">
+                <button class="action-btn" (click)="extractFromPrompt()">Extract</button>
+            </div>
             <span class="suggested-label">suggested prompts</span>
         </div>
 
@@ -26,6 +30,25 @@
             </div>
         </div>
     </div>
+
+    <!-- Field Type (Always Visible) -->
+    <div class="config-section">
+        <div class="form-group">
+            <label>Field Type</label>
+            <select [(ngModel)]="fieldType" (ngModelChange)="onFieldChange()">
+                <option value="" disabled selected>-- Select Field Type --</option>
+                <option value="Header">Header</option>
+                <option value="Table">Table</option>
+            </select>
+        </div>
+    </div>
+
+
+ <!-- Instruction Field -->
+            <div class="form-group">
+                <label>Instruction</label>
+                <textarea [(ngModel)]="instruction" (ngModelChange)="onFieldChange()" placeholder="Enter extraction instruction"></textarea>
+            </div>
 
     <!-- Field Setup Section -->
     <div class="config-section">
@@ -50,11 +73,6 @@
             </div>
 
             <div class="form-group">
-                <label>Field Type</label>
-                <input type="text" [(ngModel)]="fieldType" (ngModelChange)="onFieldChange()">
-            </div>
-
-            <div class="form-group">
                 <label>Category</label>
                 <input type="text" [(ngModel)]="category" (ngModelChange)="onFieldChange()">
             </div>
@@ -68,6 +86,8 @@
                 <label>Table Name</label>
                 <input type="text" [(ngModel)]="tableName" (ngModelChange)="onFieldChange()">
             </div>
+
+           
 
             <!-- Checkboxes and Action -->
             <div class="checkbox-row">
@@ -105,7 +125,7 @@
     <div class="config-section">
         <div class="section-header" (click)="toggleRuleSetup()">
             <span class="section-title">RULE SETUP</span>
-            <svg class="expand-icon" [class.expanded]="fieldSetupExpanded" width="24" height="25" viewBox="0 0 24 25"
+            <svg class="expand-icon" [class.expanded]="ruleSetupExpanded" width="24" height="25" viewBox="0 0 24 25"
                 fill="none">
                 <path
                     d="M16.9997 13.536L12.7097 9.29604C12.6167 9.20231 12.5061 9.12792 12.3843 9.07715C12.2624 9.02638 12.1317 9.00024 11.9997 9.00024C11.8677 9.00024 11.737 9.02638 11.6151 9.07715C11.4933 9.12792 11.3827 9.20231 11.2897 9.29604L7.0497 13.536C6.95598 13.629 6.88158 13.7396 6.83081 13.8615C6.78004 13.9833 6.75391 14.114 6.75391 14.246C6.75391 14.3781 6.78004 14.5088 6.83081 14.6306C6.88158 14.7525 6.95598 14.8631 7.0497 14.956C7.23707 15.1423 7.49052 15.2468 7.7547 15.2468C8.01889 15.2468 8.27234 15.1423 8.4597 14.956L11.9997 11.416L15.5397 14.956C15.726 15.1408 15.9774 15.2449 16.2397 15.246C16.3713 15.2468 16.5018 15.2216 16.6236 15.1718C16.7454 15.122 16.8563 15.0487 16.9497 14.956C17.0468 14.8664 17.1251 14.7585 17.1802 14.6384C17.2353 14.5183 17.2661 14.3885 17.2708 14.2565C17.2754 14.1244 17.2539 13.9928 17.2073 13.8691C17.1608 13.7455 17.0902 13.6323 16.9997 13.536Z"
@@ -119,33 +139,7 @@
             <div class="rule-item">
                 <span class="rule-name">{{ item }}</span>
                 <div class="rule-actions">
-                    <button (click)="onRuleAction('add', item)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="18" viewBox="0 0 17 18"
-                            fill="#082491">
-                            <path
-                                d="M7.48958 13.1552H9.12138V9.89164H12.385V8.25984H9.12138V4.99625H7.48958V8.25984H4.22598V9.89164H7.48958V13.1552ZM8.30548 17.2347C7.17682 17.2347 6.11615 17.024 5.12347 16.6024C4.13079 16.1673 3.2673 15.5825 2.53299 14.8482C1.79868 14.1139 1.21395 13.2504 0.778807 12.2578C0.357258 11.2651 0.146484 10.2044 0.146484 9.07574C0.146484 7.94708 0.357258 6.88641 0.778807 5.89374C1.21395 4.90106 1.79868 4.03756 2.53299 3.30325C3.2673 2.56894 4.13079 1.99101 5.12347 1.56947C6.11615 1.13432 7.17682 0.916748 8.30548 0.916748C9.43414 0.916748 10.4948 1.13432 11.4875 1.56947C12.4802 1.99101 13.3437 2.56894 14.078 3.30325C14.8123 4.03756 15.3902 4.90106 15.8118 5.89374C16.2469 6.88641 16.4645 7.94708 16.4645 9.07574C16.4645 10.2044 16.2469 11.2651 15.8118 12.2578C15.3902 13.2504 14.8123 14.1139 14.078 14.8482C13.3437 15.5825 12.4802 16.1673 11.4875 16.6024C10.4948 17.024 9.43414 17.2347 8.30548 17.2347ZM8.30548 15.6029C10.1277 15.6029 11.6711 14.9706 12.9357 13.706C14.2004 12.4413 14.8327 10.8979 14.8327 9.07574C14.8327 7.25357 14.2004 5.71016 12.9357 4.44551C11.6711 3.18087 10.1277 2.54855 8.30548 2.54855C6.4833 2.54855 4.93989 3.18087 3.67525 4.44551C2.41061 5.71016 1.77828 7.25357 1.77828 9.07574C1.77828 10.8979 2.41061 12.4413 3.67525 13.706C4.93989 14.9706 6.4833 15.6029 8.30548 15.6029Z"
-                                fill="#082491" />
-                        </svg></button>
-                    <button (click)="onRuleAction('edit', item)"><svg xmlns="http://www.w3.org/2000/svg" width="15"
-                            height="16" viewBox="0 0 15 16" fill="none">
-                            <g clip-path="url(#clip0_116_556)">
-                                <path
-                                    d="M14.7115 4.2102C14.7123 3.97347 14.666 3.73895 14.5754 3.52024C14.4848 3.30154 14.3517 3.103 14.1837 2.93617L12.7371 1.48912C12.399 1.15197 11.941 0.962646 11.4636 0.962646C10.9861 0.962646 10.5281 1.15197 10.19 1.48912L1.68943 9.99059C1.60438 10.0813 1.54223 10.1909 1.50815 10.3105L0.504896 14.334C0.4761 14.4493 0.477633 14.5701 0.509347 14.6846C0.541061 14.7991 0.601875 14.9035 0.685873 14.9875C0.769872 15.0716 0.874193 15.1324 0.98869 15.1642C1.10319 15.196 1.22396 15.1976 1.33926 15.1689L5.36327 14.1651C5.48397 14.1321 5.5932 14.0665 5.68362 13.9843L14.1837 5.48331C14.3515 5.31658 14.4846 5.1182 14.5752 4.89966C14.6658 4.68112 14.7121 4.44677 14.7115 4.2102ZM9.11927 4.50759L11.1662 6.55448L5.19668 12.524L3.14979 10.4771L9.11927 4.50759ZM2.54949 11.8241L3.84922 13.1238L2.11762 13.5557L2.54949 11.8241ZM13.2107 4.51035L12.1396 5.58152L10.0927 3.53463L11.1634 2.46346C11.2432 2.3842 11.3511 2.33972 11.4636 2.33972C11.576 2.33972 11.6839 2.3842 11.7637 2.46346L13.2107 3.91097C13.2897 3.99072 13.334 4.09842 13.334 4.21066C13.334 4.3229 13.2897 4.4306 13.2107 4.51035Z"
-                                    fill="#2E90FA" />
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_116_556">
-                                    <rect width="14.6862" height="14.6862" fill="white"
-                                        transform="translate(0.254883 0.732666)" />
-                                </clipPath>
-                            </defs>
-                        </svg></button>
-                    <button (click)="onRuleAction('delete', item)"><svg xmlns="http://www.w3.org/2000/svg" width="20"
-                            height="20" viewBox="0 0 20 20" fill="none">
-                            <path
-                                d="M5.81196 17.4189C5.36321 17.4189 4.97906 17.2591 4.6595 16.9395C4.33994 16.62 4.18016 16.2358 4.18016 15.7871V5.18036H3.36426V3.54857H7.44376V2.73267H12.3392V3.54857H16.4187V5.18036H15.6028V15.7871C15.6028 16.2358 15.443 16.62 15.1234 16.9395C14.8039 17.2591 14.4197 17.4189 13.971 17.4189H5.81196ZM13.971 5.18036H5.81196V15.7871H13.971V5.18036ZM7.44376 14.1553H9.07555V6.81216H7.44376V14.1553ZM10.7074 14.1553H12.3392V6.81216H10.7074V14.1553Z"
-                                fill="#2E90FA" />
-                        </svg></button>
+                    <!-- rule action buttons here -->
                 </div>
             </div>
             }

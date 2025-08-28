@@ -1,0 +1,23 @@
+<div class="prompt-box">
+  <input
+    type="text"
+    [(ngModel)]="userPrompt"
+    placeholder="Type prompt, e.g. Consignee"
+  />
+  <button (click)="onExtractPrompt()">Extract</button>
+</div>
+
+<div *ngIf="extractedField">
+  <h4>Extracted Field:</h4>
+  <p><strong>{{ extractedField.field }}</strong>: {{ extractedField.value }}</p>
+</div>
+
+<!-- PdfConfig Form -->
+<app-pdf-config
+  [promptText]="configPrompt"
+  [fieldName]="configFieldName"
+  [displayName]="configDisplayName"
+  [instruction]="configInstruction"
+  [category]="configCategory"
+  [fieldType]="configFieldType"
+></app-pdf-config>

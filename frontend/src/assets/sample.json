@@ -1,0 +1,24 @@
+{
+  "Exporter": "GODREJ & BOYCE MFG. CO. LTD.",
+  "Consignee": "SENSY S.A.",
+  "InvoiceNo": "1000Q1X11000197",
+  "InvoiceDate": "04/03/2025",
+  "GSTNo": "27AAACG1395D1ZU",
+  "ShippingDetails": {
+    "ModeOfShipment": "AIR",
+    "AirportOfLoading": "Mumbai Air Cargo",
+    "AirportOfDischarge": "BRUSSELS AIR PORT",
+    "FinalDestination": "Belgium"
+  },
+  "Items": [
+    {
+      "SalesOrder": "QOE000120",
+      "NoOfPackages": 1,
+      "Description": "ES Underwater load Pin along",
+      "Quantity": 1,
+      "Unit": "ECH",
+      "GrossWeight": "1.75 KG",
+      "Amount": "2010.000 EUR"
+    }
+  ]
+}

@@ -181,6 +181,26 @@
   gap: 10px;
   display: flex;
 }
+.form-group select {
+  align-self: stretch;
+  height: 41.54px;
+  padding: 10px;
+  border-radius: 6.39px;
+  outline: 0.80px #0088FF solid;
+  outline-offset: -0.80px;
+  border: none;
+  background: white;
+  color: #141414;
+  font-size: 16px;
+  font-family: Inter;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  outline: 0.80px #5570F1 solid;
+}
+
 
 .form-group label {
   color: #141414;
@@ -387,4 +407,26 @@
     flex-direction: column;
     gap: 8px;
   }
+}
+
+
+.form-group textarea {
+  width: 100%;                  /* full width like prompt */
+  min-height: 60px;
+  padding: 10px;
+  border-radius: 6.39px;
+  outline: 0.80px #0088FF solid;
+  outline-offset: -0.80px;
+  border: none;
+  background: white;
+  color: #141414;
+  font-size: 16px;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  resize: vertical;
+  box-sizing: border-box;       /* prevent overflow */
+}
+
+.form-group textarea:focus {
+  outline: 0.80px #5570F1 solid;
 }
