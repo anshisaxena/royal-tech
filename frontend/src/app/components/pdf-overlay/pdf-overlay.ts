@@ -186,68 +186,136 @@ export class PdfOverlayComponent implements OnInit {
       try {
         words = await this.mappingService.loadJson('json/file1');
         const jsonPage = pageNo - 1;
+        // Find all words on this page that overlap the selection box
         const matched = words.filter((w: any) =>
           +w.pageNo === jsonPage &&
-          +w.leftX >= selBox.left &&
-          +w.topY >= selBox.top &&
-          +w.rightX <= selBox.right &&
-          +w.bottomY <= selBox.bottom
+          +w.rightX > selBox.left &&
+          +w.leftX < selBox.right &&
+          +w.bottomY > selBox.top &&
+          +w.topY < selBox.bottom
         );
-        text = matched.map((w: any) => w.text).join(' ').trim();
-        labelText = matched.map((w: any) => w.text).join(' ').trim().replace(/\s*:\s*$/, '');
 
-        // Prefer explicit label:value inside selection
-        if (text && text.includes(':')) {
-          const idx = text.indexOf(':');
-          const k = text.slice(0, idx).trim();
-          const v = text.slice(idx + 1).trim();
-          if (k && v) parsed = { key: k, value: v };
-        }
-
-        // If not parsed yet: find a JSON entry on the same page whose full text contains the label and a colon
-        if (!parsed && labelText) {
-          const labelLower = labelText.toLowerCase();
-          const candidate = words.find((w: any) =>
-            +w.pageNo === jsonPage && typeof w.text === 'string' && w.text.includes(':') && w.text.toLowerCase().includes(labelLower)
-          );
-          if (candidate) {
-            const line: string = candidate.text;
-            const idx = line.indexOf(':');
-            if (idx > -1) {
-              const k = line.slice(0, idx).trim();
-              const v = line.slice(idx + 1).trim();
-              if (k && v) parsed = { key: k, value: v };
-            }
+        // --- Improved: Use CSV row containing selection center as primary label/value ---
+        let selCx = (selBox.left + selBox.right) / 2;
+        let selCy = (selBox.top + selBox.bottom) / 2;
+        let bestRow: CsvRow | undefined;
+        let minDist = Number.POSITIVE_INFINITY;
+        for (const r of rows) {
+          const l = parseFloat((r as any).leftX);
+          const t = parseFloat((r as any).topY);
+          const rgt = parseFloat((r as any).rightX);
+          const btm = parseFloat((r as any).bottomY);
+          if (selCx >= l && selCx <= rgt && selCy >= t && selCy <= btm) {
+            bestRow = r;
+            break;
+          }
+          // If not inside, track nearest center
+          const cx = (l + rgt) / 2, cy = (t + btm) / 2;
+          const dist = Math.hypot(cx - selCx, cy - selCy);
+          if (dist < minDist) {
+            minDist = dist;
+            bestRow = r;
           }
         }
 
-        // If no colon captured, try to read value to the right in a horizontal window
-        // Note: this is a fallback only when there are no CSV matches later
-        if (!parsed && matched.length > 0) {
-
-          // Define a right-side window aligned with selection's vertical band
-          const bandTol = 24;
-          const searchLeft = selBox.right - 2;
-          const searchRight = selBox.right + 1400; // wide window to capture long values
-          const searchTop = selBox.top - bandTol;
-          const searchBottom = selBox.bottom + bandTol;
-
-          const rightWords = words
+        // If a CSV row is found, use its Name as label and extract value from JSON words inside its box
+        if (bestRow) {
+          const l = parseFloat((bestRow as any).leftX);
+          const t = parseFloat((bestRow as any).topY);
+          const rgt = parseFloat((bestRow as any).rightX);
+          const btm = parseFloat((bestRow as any).bottomY);
+          const jsonPage = pageNo - 1;
+          const inside = words
             .filter((w: any) =>
               +w.pageNo === jsonPage &&
-              // any horizontal overlap with right window
-              +w.rightX >= searchLeft && +w.leftX <= searchRight &&
-              // vertical overlap with band
-              !(+w.bottomY < searchTop || +w.topY > searchBottom)
+              +w.leftX >= l && +w.topY >= t && +w.rightX <= rgt && +w.bottomY <= btm
             )
             .sort((a: any, b: any) => +a.leftX - +b.leftX);
+          const value = inside.map((w: any) => w.text).join(' ').trim();
+          const key = (bestRow as any).Name || 'Field';
+          if (key && value) {
+            parsed = { key, value };
+            labelText = key;
+          }
+        }
 
-          let rightText = rightWords.map((w: any) => w.text).join(' ').trim();
-          // Clean leading separators like ':' or '-'
-          rightText = rightText.replace(/^[\s:;\-]+/, '');
+        // If not found, fallback to explicit label:value inside selection (multi-word)
+        if (!parsed && matched.length > 0) {
+          const joined = matched.map((w: any) => w.text).join(' ').trim();
+          // Try to split on colon or similar
+          const colonIdx = joined.indexOf(':');
+          if (colonIdx > 0) {
+            const k = joined.slice(0, colonIdx).trim();
+            const v = joined.slice(colonIdx + 1).trim();
+            if (k && v) parsed = { key: k, value: v };
+          }
+        }
 
-          if (labelText && rightText) {
-            parsed = { key: labelText, value: rightText };
+        // If still not found, fallback to nearest label in JSON (old logic)
+        if (!parsed) {
+          let labelWord: any = null;
+          let label = '';
+          let minDist = Number.POSITIVE_INFINITY;
+          const labelCandidates = words.filter((w: any) =>
+            +w.pageNo === jsonPage &&
+            typeof w.text === 'string' &&
+            (
+              w.text.endsWith(':') ||
+              w.text.match(/No\.?$/i) ||
+              w.text.match(/No\s*:/i) ||
+              w.text.match(/GSTNo\.?$/i) ||
+              w.text.match(/GSTNo\s*:?/i) ||
+              w.text.match(/Consignee/i) ||
+              w.text.match(/Buyer\/Applicant/i) ||
+              w.text.match(/Tax Invoice/i) ||
+              w.text.match(/Invoice/i) ||
+              w.text.match(/Exporter/i)
+            )
+          );
+          for (const w of labelCandidates) {
+            const cx = (+w.leftX + +w.rightX) / 2;
+            const cy = (+w.topY + +w.bottomY) / 2;
+            const dist = Math.abs(selCy - cy) * 2 + Math.abs(selCx - cx);
+            if (dist < minDist) {
+              minDist = dist;
+              labelWord = w;
+              label = w.text.replace(/:$/, '').trim();
+            }
+          }
+          if (!labelWord && matched.length > 0) {
+            labelWord = matched[0];
+            label = matched[0].text;
+          }
+          if (labelWord) {
+            const bandTol = 12;
+            const searchLeft = +labelWord.rightX + 1;
+            const searchRight = searchLeft + 800;
+            const searchTop = +labelWord.topY - bandTol;
+            const searchBottom = +labelWord.bottomY + bandTol;
+            const rightWords = words
+              .filter((w: any) =>
+                +w.pageNo === jsonPage &&
+                +w.leftX >= searchLeft && +w.leftX <= searchRight &&
+                +w.topY <= searchBottom && +w.bottomY >= searchTop
+              )
+              .sort((a: any, b: any) => +a.leftX - +b.leftX);
+            let rightText = rightWords.map((w: any) => w.text).join(' ').trim();
+            rightText = rightText.replace(/^[\s:;\-]+/, '');
+            let sameWordValue: string | undefined;
+            if (labelWord.text && labelWord.text.includes(':')) {
+              const idx = labelWord.text.indexOf(':');
+              const k = labelWord.text.slice(0, idx).trim();
+              const v = labelWord.text.slice(idx + 1).trim();
+              if (k && v) {
+                label = k;
+                sameWordValue = v;
+              }
+            }
+            if (label && sameWordValue) {
+              parsed = { key: label, value: sameWordValue };
+            } else if (label && rightText) {
+              parsed = { key: label, value: rightText };
+            }
           }
         }
       } catch {}
@@ -276,8 +344,6 @@ export class PdfOverlayComponent implements OnInit {
           let inside = words
             .filter((w: any) => +w.pageNo === jsonPage && +w.leftX >= l && +w.topY >= t && +w.rightX <= rgt && +w.bottomY <= btm)
             .sort((a: any, b: any) => +a.leftX - +b.leftX);
-
-          // Fallback: if the row box only covers the label, expand to the right and accept overlap in band
           if (inside.length === 0) {
             const bandTol = 16;
             const searchLeft = rgt - 2;
@@ -292,7 +358,6 @@ export class PdfOverlayComponent implements OnInit {
               )
               .sort((a: any, b: any) => +a.leftX - +b.leftX);
           }
-
           const value = inside.map((w: any) => w.text).join(' ').trim();
           const key = (r as any).Name || 'Field';
           if (key && value) {
@@ -304,29 +369,18 @@ export class PdfOverlayComponent implements OnInit {
       }
 
       // If there are CSV-derived pairs, prefer them for the final result
-      if (pairs.length) {
+      if (pairs.length && !parsed) {
+        // Only use if not already parsed from bestRow above
         const selCx = (selBox.left + selBox.right) / 2;
         const selCy = (selBox.top + selBox.bottom) / 2;
-        const labelLower = (labelText || '').toLowerCase();
-        // Prefer pair whose key best matches labelText, else nearest center distance
         let best: Pair | null = null;
-        let bestScore = Number.NEGATIVE_INFINITY;
+        let minDist = Number.POSITIVE_INFINITY;
         pairs.forEach(p => {
-          // textual match score
-          let score = 0;
-          if (labelLower && p.key) {
-            const keyLower = p.key.toLowerCase();
-            if (keyLower.includes(labelLower) || labelLower.includes(keyLower)) score += 1000;
-            // bonus for exact match
-            if (keyLower === labelLower) score += 500;
-          }
-          // proximity score (smaller distance → higher score)
           const cx = (p.left + p.right) / 2;
           const cy = (p.top + p.bottom) / 2;
           const dist = Math.hypot(cx - selCx, cy - selCy);
-          score += 300 - Math.min(300, dist); // cap influence
-          if (score > bestScore) {
-            bestScore = score;
+          if (dist < minDist) {
+            minDist = dist;
             best = p;
           }
         });

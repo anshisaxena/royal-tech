@@ -26,6 +26,7 @@ export class CsvService {
       r2[3] < r1[1] 
     );
   }
+  
 
   parseCsvAndFindIntersections(
     csvContent: string,

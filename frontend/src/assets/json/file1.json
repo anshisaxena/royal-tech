@@ -48,10 +48,10 @@
         "imageName" : "/home/user/save-data-here/public-folder/demo-files/File2f1efc2585a95804951b27e898583c0e_GODREJ_1.png"
     },
     {
-        "leftX" : 158,
-        "topY" : 538,
-        "rightX" : 271,
-        "bottomY" : 572,
+        "leftX" : 122,   
+        "topY" : 415,
+        "rightX" : 290,
+        "bottomY" : 474,
         "text" : "Exporter",
         "Name" : "Exporter",
         "pageNo" : 0,

@@ -49,7 +49,18 @@
              [style.height.px]="field.height * scale" />
     </ng-container>
 
-    <!-- Red labels over the PDF/image for each selection result on current page -->
+    <!-- Persisted selection boxes (normalized → scaled) -->
+    <ng-container *ngFor="let b of drawnBoxes">
+      <div class="selection-box"
+           *ngIf="b.pageNo === currentPage"
+           [style.top.px]="b.top * scale"
+           [style.left.px]="b.left * scale"
+           [style.width.px]="(b.right - b.left) * scale"
+           [style.height.px]="(b.bottom - b.top) * scale">
+      </div>
+    </ng-container>
+
+    <!-- ✅ Red labels over the PDF/image for each selection result on current page -->
     <ng-container *ngFor="let grp of csvSelectionResults">
       <div *ngIf="grp.pageNo === currentPage"
            class="label-red"
@@ -71,17 +82,6 @@
        [style.width.px]="selection.width"
        [style.height.px]="selection.height">
   </div>
-
-  <!-- Persisted selection boxes (normalized → scaled) -->
-  <ng-container *ngFor="let b of drawnBoxes">
-    <div class="selection-box"
-         *ngIf="b.pageNo === currentPage"
-         [style.top.px]="b.top * scale"
-         [style.left.px]="b.left * scale"
-         [style.width.px]="(b.right - b.left) * scale"
-         [style.height.px]="(b.bottom - b.top) * scale">
-    </div>
-  </ng-container>
 
   <!-- Selection results (from image1.csv) -->
   <div *ngIf="csvSelectionResults.length" class="selection-results">
