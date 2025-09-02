@@ -43,6 +43,76 @@
         </div>
     </div>
 
+    <!-- Dynamic Header Sections from sample.json -->
+    @if (fieldType === 'Header') {
+    @for (header of headers; track header.name) {
+    <div class="config-section">
+        <div class="section-header" (click)="toggleHeader(header)">
+            <span class="section-title">{{ header.name | uppercase }}</span>
+            <svg class="expand-icon" [class.expanded]="header.expanded" width="24" height="25" viewBox="0 0 24 25"
+                fill="none">
+                <path
+                    d="M16.9997 13.536L12.7097 9.29604C12.6167 9.20231 12.5061 9.12792 12.3843 9.07715C12.2624 9.02638 12.1317 9.00024 11.9997 9.00024C11.8677 9.00024 11.737 9.02638 11.6151 9.07715C11.4933 9.12792 11.3827 9.20231 11.2897 9.29604L7.0497 13.536C6.95598 13.629 6.88158 13.7396 6.83081 13.8615C6.78004 13.9833 6.75391 14.114 6.75391 14.246C6.75391 14.3781 6.78004 14.5088 6.83081 14.6306C6.88158 14.7525 6.95598 14.8631 7.0497 14.956C7.23707 15.1423 7.49052 15.2468 7.7547 15.2468C8.01889 15.2468 8.27234 15.1423 8.4597 14.956L11.9997 11.416L15.5397 14.956C15.726 15.1408 15.9774 15.2449 16.2397 15.246C16.3713 15.2468 16.5018 15.2216 16.6236 15.1718C16.7454 15.122 16.8563 15.0487 16.9497 14.956C17.0468 14.8664 17.1251 14.7585 17.1802 14.6384C17.2353 14.5183 17.2661 14.3885 17.2708 14.2565C17.2754 14.1244 17.2539 13.9928 17.2073 13.8691C17.1608 13.7455 17.0902 13.6323 16.9997 13.536Z"
+                    fill="#2363EB" />
+            </svg>
+        </div>
+
+        <div class="section-divider"></div>
+
+        @if (header.expanded) {
+        <div class="field-form">
+            @for (field of header.fields; track field.key) {
+            <div class="form-group">
+                <label>{{ field.key }}</label>
+                <input type="text" [(ngModel)]="field.value">
+            </div>
+            }
+        </div>
+        }
+    </div>
+    }
+    }
+
+    <!-- Dynamic Table Sections from sample.json -->
+    @if (fieldType === 'Table') {
+    @for (table of tables; track table.name) {
+    <div class="config-section">
+        <div class="section-header" (click)="toggleTable(table)">
+            <span class="section-title">{{ table.name | uppercase }}</span>
+            <svg class="expand-icon" [class.expanded]="table.expanded" width="24" height="25" viewBox="0 0 24 25"
+                fill="none">
+                <path
+                    d="M16.9997 13.536L12.7097 9.29604C12.6167 9.20231 12.5061 9.12792 12.3843 9.07715C12.2624 9.02638 12.1317 9.00024 11.9997 9.00024C11.8677 9.00024 11.737 9.02638 11.6151 9.07715C11.4933 9.12792 11.3827 9.20231 11.2897 9.29604L7.0497 13.536C6.95598 13.629 6.88158 13.7396 6.83081 13.8615C6.78004 13.9833 6.75391 14.114 6.75391 14.246C6.75391 14.3781 6.78004 14.5088 6.83081 14.6306C6.88158 14.7525 6.95598 14.8631 7.0497 14.956C7.23707 15.1423 7.49052 15.2468 7.7547 15.2468C8.01889 15.2468 8.27234 15.1423 8.4597 14.956L11.9997 11.416L15.5397 14.956C15.726 15.1408 15.9774 15.2449 16.2397 15.246C16.3713 15.2468 16.5018 15.2216 16.6236 15.1718C16.7454 15.122 16.8563 15.0487 16.9497 14.956C17.0468 14.8664 17.1251 14.7585 17.1802 14.6384C17.2353 14.5183 17.2661 14.3885 17.2708 14.2565C17.2754 14.1244 17.2539 13.9928 17.2073 13.8691C17.1608 13.7455 17.0902 13.6323 16.9997 13.536Z"
+                    fill="#2363EB" />
+            </svg>
+        </div>
+
+        <div class="section-divider"></div>
+        @if (table.expanded) {
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of table.rows; track row.key) {
+                        <tr>
+                            <td>{{ row.key }}</td>
+                            <td><input type="text" [(ngModel)]="row.value"></td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+    }
+    }
+
+
 
  <!-- Instruction Field -->
             <div class="form-group">

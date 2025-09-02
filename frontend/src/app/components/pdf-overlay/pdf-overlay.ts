@@ -25,6 +25,8 @@ export class PdfOverlayComponent implements OnInit {
   @Input() originalData: any;
   @Input() jsonData: any = {};
   @Input() currentPage: number = 1;
+  @Input() highlights: Array<{ pageNo: number; key: string; labelText?: string; value: string; labelBox?: { left: number; top: number; right: number; bottom: number }; valueBox?: { left: number; top: number; right: number; bottom: number } }> = [];
+  @Input() showHighlights: boolean = true;
 
   fieldMapping: any[] = [];
   editedFields = new Set<string>();
@@ -42,7 +44,7 @@ export class PdfOverlayComponent implements OnInit {
   private startY = 0;
 
   // CSV cache and last results for UI display
-  private csvTextCache: string | null = null;
+  private csvTextCache: Map<number, string> = new Map();
   public csvSelectionResults: Array<{
     pageNo: number,
     box: { left: number; top: number; right: number; bottom: number },
@@ -55,10 +57,17 @@ export class PdfOverlayComponent implements OnInit {
   // Persisted selection rectangles (normalized coords) per page
   public drawnBoxes: Array<{ pageNo: number; left: number; top: number; right: number; bottom: number }> = [];
 
+  // Hide static overlays by default (show only on prompt-driven highlights)
+  public showStaticOverlays: boolean = false;
+
+  public Math = Math;
+
   constructor(private mappingService: MappingService, private csvService: CsvService) {}
 
   ngOnInit() {
     this.isImage = this.fileObj?.type.startsWith('image/') || false;
+    console.log("PdfOverlayComponent highlights input: ", this.highlights);
+    console.log("PdfOverlayComponent currentPage: ", this.currentPage);
     this.updatePageFields();
   }
 
@@ -117,6 +126,21 @@ export class PdfOverlayComponent implements OnInit {
     else this.editedFields.delete(key);
   }
 
+  onHighlightBlur(highlight: { key: string; value: string; pageNo: number }) {
+    const pageKey = `page ${highlight.pageNo}`;
+    if (!this.jsonData[pageKey]) {
+      this.jsonData[pageKey] = {};
+    }
+    this.jsonData[pageKey][highlight.key] = highlight.value;
+
+    const originalValue = this.originalData?.[highlight.key];
+    if (highlight.value !== originalValue) {
+      this.editedFields.add(highlight.key);
+    } else {
+      this.editedFields.delete(highlight.key);
+    }
+  }
+
   // ------------------ Selection Logic ------------------
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent) {
@@ -169,21 +193,25 @@ export class PdfOverlayComponent implements OnInit {
       // Persist the selection box for visual display
       this.drawnBoxes.push({ pageNo, ...selBox });
 
+      const csvFileName = `image${pageNo}`;
+      const jsonFileName = `file${pageNo}`;
+
       // Load CSV and find intersections
-      if (!this.csvTextCache) {
-        const resp = await fetch('assets/csv/image1.csv');
-        this.csvTextCache = await resp.text();
+      if (!this.csvTextCache.has(pageNo)) {
+        const resp = await fetch(`assets/csv/${csvFileName}.csv`);
+        this.csvTextCache.set(pageNo, await resp.text());
       }
+      const csvContent = this.csvTextCache.get(pageNo)!;
       const resultsByFile = this.csvService.parseCsvAndFindIntersections(
-        this.csvTextCache!,
+        csvContent,
         [selBox.left, selBox.top, selBox.right, selBox.bottom],
         {
           pageNo: pageNo - 1,
-          fileName: 'image1',
+          fileName: csvFileName,
           expand: 8
         }
       );
-      const rows: CsvRow[] = resultsByFile['image1'] ? resultsByFile['image1'] : (Object.values(resultsByFile).flat() as CsvRow[]);
+      const rows: CsvRow[] = resultsByFile[csvFileName] ? resultsByFile[csvFileName] : (Object.values(resultsByFile).flat() as CsvRow[]);
 
       // Also read text from JSON words within the selection (pageNo is 0-based in JSON)
       let text = '';
@@ -191,7 +219,7 @@ export class PdfOverlayComponent implements OnInit {
       let words: any[] = [];
       let labelText: string | undefined;
       try {
-        words = await this.mappingService.loadJson('json/file1');
+        words = await this.mappingService.loadJson(`json/${jsonFileName}`);
         const jsonPage = pageNo - 1;
         // Find all words on this page that overlap the selection box
         const matched = words.filter((w: any) =>

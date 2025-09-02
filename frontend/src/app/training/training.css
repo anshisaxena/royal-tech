@@ -18,7 +18,6 @@
   align-items: flex-start;      /* Align content to the top */
   height: 100%;
   width: 100%;
-  margin-left: 30px;            /* Push the content further to the left */
 }
 
 .pdf-processor-placeholder {
@@ -183,4 +182,29 @@
 .image-selector button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.prompt-results {
+    padding: 10px;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+
+.prompt-result-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.red-box {
+    border: 2px dashed red;
+    background-color: rgba(255,0,0,0.15);
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.blue-box {
+    border: 2px solid blue;
+    background-color: rgba(0,0,255,0.1);
+    padding: 5px;
 }

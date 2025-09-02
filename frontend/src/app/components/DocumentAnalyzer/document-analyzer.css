@@ -22,4 +22,14 @@
 .prompt-box button:hover {
   background: #005fa3;
 }
+/* document-analyzer.css */
+.extracted-header {
+  font-size: 15px;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background: #f0f8ff;
+  border-left: 4px solid #007acc;
+  border-radius: 4px;
+}
+
 

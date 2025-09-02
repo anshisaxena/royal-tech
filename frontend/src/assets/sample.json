@@ -1,24 +1,47 @@
 {
-  "Exporter": "GODREJ & BOYCE MFG. CO. LTD.",
-  "Consignee": "SENSY S.A.",
-  "InvoiceNo": "1000Q1X11000197",
-  "InvoiceDate": "04/03/2025",
-  "GSTNo": "27AAACG1395D1ZU",
-  "ShippingDetails": {
-    "ModeOfShipment": "AIR",
-    "AirportOfLoading": "Mumbai Air Cargo",
-    "AirportOfDischarge": "BRUSSELS AIR PORT",
-    "FinalDestination": "Belgium"
+  "invoiceDetails": {
+    "type":"header",
+    "invoiceType": "GST TAX INVOICE CUM PACKING LIST FOR EXPORT",
+    "irnNo": "c965d001b813b0078a50d70b0d5dea498cba7bccc27fdcf082af9441e12b5b71",
+    "invoiceNo": "1000Q1X11000197",
+    "invoiceDate": "04/03/2025",
+    "cinNo": "U28993MH1932PLC001828",
+    "gstNo": "27AAACG1395D1ZU",
+    "page": 1
   },
-  "Items": [
+  "parties": {
+        "type":"header",
+
+    "exporter": "GODREJ & BOYCE MFG. CO. LTD.",
+    "consigner": "GODREJ & BOYCE PLANT 9 PES",
+    "consignee": "SENSY S.A."
+  },
+  "shipment": {
+        "type":"header",
+
+    "modeOfShipment": "AIR",
+    "airportOfLoading": "Mumbai Air Cargo",
+    "airportOfDischarge": "BRUSSELS AIR PORT",
+    "finalDestination": "Charleroi, Belgium",
+    "termsOfDelivery": "DDP",
+    "termsOfPayment": "FREE OF COST"
+  },
+  "items": [
     {
-      "SalesOrder": "QOE000120",
-      "NoOfPackages": 1,
-      "Description": "ES Underwater load Pin along",
-      "Quantity": 1,
-      "Unit": "ECH",
-      "GrossWeight": "1.75 KG",
-      "Amount": "2010.000 EUR"
+          "type":"table",
+
+      "salesOrder":"QOE000120/10",
+      "descriptionOfGoods": null,
+      "quantity": null,
+      "unitRate": null,
+      "amount": null
     }
+  ],
+  "rawTableHeaders": [
+    "Sales Order",
+    "Description of Goods",
+    "Quantity",
+    "Unit Rate",
+    "Amount"
   ]
 }

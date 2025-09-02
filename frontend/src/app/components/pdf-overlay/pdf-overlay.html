@@ -26,27 +26,23 @@
 
   <!-- Overlay Layer -->
   <div class="overlay-layer">
-    <ng-container *ngFor="let field of fieldMapping">
-      <div class="box red-dashed"
-           [style.top.px]="field.top * scale"
-           [style.left.px]="field.left * scale"
-           [style.width.px]="field.width * scale"
-           [style.height.px]="field.height * scale">
-        {{ originalData?.[field.key] }}
-      </div>
-
-      <input type="text"
-             class="box"
-             [ngClass]="{
-               'blue-border': !editedFields.has(field.key),
-               'yellow-border': editedFields.has(field.key)
-             }"
-             [(ngModel)]="tempValues[field.key]"
-             (blur)="onBlur(field.key)"
+    <!-- Hide static red/blue boxes unless explicitly allowed -->
+    <ng-container *ngIf="showStaticOverlays">
+      <ng-container *ngFor="let field of fieldMapping">
+        <div class="key-value-container"
              [style.top.px]="field.top * scale"
-             [style.left.px]="(field.left + field.width + 5) * scale"
-             [style.width.px]="field.width * scale"
-             [style.height.px]="field.height * scale" />
+             [style.left.px]="field.left * scale">
+          <div class="box red-dashed">
+            {{ field.key }}
+          </div>
+          <input type="text"
+                 class="box"
+                 [ngClass]="{ 'blue-border': !editedFields.has(field.key), 'yellow-border': editedFields.has(field.key) }"
+                 [(ngModel)]="tempValues[field.key]"
+                 (blur)="onBlur(field.key)"
+                 [style.width]="(tempValues[field.key]?.length || 15) + 'ch'" />
+        </div>
+      </ng-container>
     </ng-container>
 
     <!-- Persisted selection boxes (normalized → scaled) -->
@@ -60,7 +56,7 @@
       </div>
     </ng-container>
 
-    <!-- ✅ Red labels over the PDF/image for each selection result on current page -->
+    <!-- Prompt-driven highlight labels over the PDF/image for current page -->
     <ng-container *ngFor="let grp of csvSelectionResults">
       <div *ngIf="grp.pageNo === currentPage"
            class="label-red"
@@ -71,6 +67,63 @@
         </ng-container>
         <ng-template #rawText>{{ grp.text }}</ng-template>
       </div>
+    </ng-container>
+
+    <!-- New: Draw highlight rectangles from prompt extraction -->
+    <ng-container *ngFor="let h of highlights">
+      <!-- Case 1: Both label and value boxes have coordinates. -->
+      <ng-container *ngIf="h.pageNo === currentPage && h.labelBox && h.valueBox">
+        <!-- Sub-case 1A: Key and Value are on the same line (adjacent) -->
+        <ng-container *ngIf="Math.abs(h.labelBox.top - h.valueBox.top) < 20">
+          <div class="key-value-container" [style.top.px]="h.labelBox.top * scale" [style.left.px]="h.labelBox.left * scale">
+            <div class="box red-dashed">
+              {{ h.labelText || h.key }}
+            </div>
+            <input type="text"
+                   class="box"
+                   [ngClass]="{ 'blue-border': !editedFields.has(h.key), 'yellow-border': editedFields.has(h.key) }"
+                   [(ngModel)]="h.value"
+                   (blur)="onHighlightBlur(h)"
+                   [style.width]="(h.value?.length || 15) + 'ch'" />
+          </div>
+        </ng-container>
+
+        <!-- Sub-case 1B: Key and Value are not on the same line (e.g., table header/cell) -->
+        <ng-container *ngIf="Math.abs(h.labelBox.top - h.valueBox.top) >= 20">
+          <div class="box red-dashed"
+               style="width: auto"
+               [style.top.px]="h.labelBox.top * scale"
+               [style.left.px]="h.labelBox.left * scale">
+            {{ h.labelText || h.key }}
+          </div>
+          <input type="text"
+                 class="box"
+                 [ngClass]="{ 'blue-border': !editedFields.has(h.key), 'yellow-border': editedFields.has(h.key) }"
+                 [(ngModel)]="h.value"
+                 (blur)="onHighlightBlur(h)"
+                 [style.width.ch]="h.value?.length || 15"
+                 [style.top.px]="h.valueBox.top * scale"
+                 [style.left.px]="h.valueBox.left * scale" />
+        </ng-container>
+      </ng-container>
+
+      <!-- Case 2: Fallback for adjacent key/value (only labelBox is guaranteed). Used for header data. -->
+      <ng-container *ngIf="h.pageNo === currentPage && h.labelBox && !h.valueBox">
+        <div class="key-value-container"
+             [style.top.px]="h.labelBox.top * scale"
+             [style.left.px]="h.labelBox.left * scale">
+          <div class="box red-dashed">
+            {{ h.labelText || h.key }}
+          </div>
+
+          <input type="text"
+                 class="box"
+                 [ngClass]="{ 'blue-border': !editedFields.has(h.key), 'yellow-border': editedFields.has(h.key) }"
+                 [(ngModel)]="h.value"
+                 (blur)="onHighlightBlur(h)"
+                 [style.width]="(h.value?.length || 15) + 'ch'" />
+        </div>
+      </ng-container>
     </ng-container>
   </div>
 

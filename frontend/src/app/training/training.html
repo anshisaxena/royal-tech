@@ -17,7 +17,8 @@
               [fileObj]="uploadedFiles[0]"
               [originalData]="originalData"
               [jsonData]="jsonData"
-              [currentPage]="1">
+              [currentPage]="1"
+              [highlights]="highlights">
             </app-pdf-overlay>
           </div>
         </ng-container>
@@ -31,7 +32,8 @@
               [fileObj]="uploadedFiles[currentImageIndex]"
               [originalData]="originalData"
               [jsonData]="jsonData"
-              [currentPage]="currentImageIndex + 1">
+              [currentPage]="currentImageIndex + 1"
+              [highlights]="highlights">
             </app-pdf-overlay>
 
             <!-- Image selector toolbar -->
@@ -51,9 +53,11 @@
       <!-- Config Section -->
       <div class="config-section">
         <app-pdf-config
+          [currentPage]="currentPageForConfig"
           (promptChange)="handlePromptChange($event)"
           (fieldConfigChange)="handleFieldConfigChange($event)"
-          (actionTriggered)="handleActionTriggered($event)">
+          (actionTriggered)="handleActionTriggered($event)"
+          (highlightRequested)="handleHighlight($event)">
         </app-pdf-config>
       </div>
 

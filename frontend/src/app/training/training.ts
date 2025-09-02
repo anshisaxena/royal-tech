@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Header } from '../components/header/header';
 import { ActionButtons } from '../components/action-buttons/action-buttons';
@@ -14,6 +14,7 @@ import { PdfConfig } from '../components/pdf-config/pdf-config';
     Header,
     ActionButtons,
     NgIf,
+    NgFor,
     FormsModule,
     PdfOverlayComponent,
     PdfConfig
@@ -27,6 +28,10 @@ export class Training implements OnInit, OnDestroy {
   fileType: 'pdf' | 'image' | null = null;
   fileURLs: Map<File, string> = new Map();
   showPDF: boolean = true;
+
+  // Highlight state from prompt extraction
+  showHighlights: boolean = true;
+  highlights: Array<{ pageNo: number; key: string; value: string; labelBox?: any; valueBox?: any }> = [];
 
   originalData: any = {
     "IRN No": "c965d001b813b0078a50d70b0d5dea498cba7bccc27fdcf082af9441e12b5b71",
@@ -45,21 +50,32 @@ export class Training implements OnInit, OnDestroy {
 
   currentImageIndex: number = 0;       // 0-based
   currentImageIndexInput: number = 1;  // 1-based for input
+  currentPageForConfig: number = 1;
 
   constructor(private fileService: FileUploadService) {}
 
   ngOnInit() {
     this.uploadedFiles = this.fileService.getFiles() || [];
+    this.updateFileContext();
+  }
 
-    if (this.uploadedFiles.length > 0) {
-      const firstFile = this.uploadedFiles[0];
-      if (firstFile.type.includes('pdf')) {
-        this.fileType = 'pdf';
-        this.showPDF = true;
-      } else if (firstFile.type.includes('image')) {
-        this.fileType = 'image';
-        this.showPDF = false;
-      }
+  private updateFileContext() {
+    if (this.uploadedFiles.length === 0) {
+      this.fileType = null;
+      this.currentPageForConfig = 1;
+      return;
+    }
+
+    const currentFile = this.uploadedFiles[this.currentImageIndex];
+    if (currentFile.type.includes('pdf')) {
+      this.fileType = 'pdf';
+      this.showPDF = true;
+      // For now, PDF page is not tracked from overlay, so we assume 1
+      this.currentPageForConfig = 1;
+    } else if (currentFile.type.includes('image')) {
+      this.fileType = 'image';
+      this.showPDF = false;
+      this.currentPageForConfig = this.currentImageIndex + 1;
     }
   }
 
@@ -74,6 +90,7 @@ export class Training implements OnInit, OnDestroy {
     const index = num - 1;
     if (index >= 0 && index < this.uploadedFiles.length) {
       this.currentImageIndex = index;
+      this.updateFileContext();
     } else {
       console.warn('Invalid image number');
     }
@@ -83,6 +100,7 @@ export class Training implements OnInit, OnDestroy {
     if (this.currentImageIndex > 0) {
       this.currentImageIndex--;
       this.currentImageIndexInput = this.currentImageIndex + 1;
+      this.updateFileContext();
     }
   }
 
@@ -90,6 +108,7 @@ export class Training implements OnInit, OnDestroy {
     if (this.currentImageIndex < this.uploadedFiles.length - 1) {
       this.currentImageIndex++;
       this.currentImageIndexInput = this.currentImageIndex + 1;
+      this.updateFileContext();
     }
   }
 
@@ -105,4 +124,18 @@ export class Training implements OnInit, OnDestroy {
   handlePromptChange(prompt: string) { console.log('Prompt changed:', prompt); }
   handleFieldConfigChange(config: any) { console.log('Field config changed:', config); }
   handleActionTriggered(action: string) { console.log('Action triggered:', action); }
+
+  handleHighlight(evt: any) {
+    // Handle special event to clear all highlights
+    if (evt && evt.clearAll) {
+      this.highlights = [];
+      return;
+    }
+
+    // Filter out any existing highlight for the same key on the same page.
+    const otherHighlights = this.highlights.filter(h => !(h.pageNo === evt.pageNo && h.key === evt.key));
+    // Create a new array to ensure Angular's change detection updates the child component.
+    this.highlights = [...otherHighlights, evt];
+    console.log('handleHighlight: ', evt);
+  }
 }

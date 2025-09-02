@@ -61,7 +61,7 @@ export class DocumentAnalyzerComponent {
     const result = await this.mappingService.extractFieldFromPrompt(
       this.userPrompt,
       'json/file1',
-      0
+      1 // Page number is 1-based
     );
 
     if (result) {

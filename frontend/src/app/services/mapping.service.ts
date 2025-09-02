@@ -8,35 +8,90 @@ import { firstValueFrom } from 'rxjs';
 })
 export class MappingService {
   private jsonCache: { [fileName: string]: any[] } = {};
+  private sampleJsonCache: any = null;
   private csvData: any[] = [];
+  private csvLoaded: boolean = false;
 
   /** Predefined static mappings (can be extended dynamically) */
   private mappings: any[] = [
-    { pageNo: 1, key: 'IRN No', top: 335, left: 240, width: 500, height: 22 },
-    { pageNo: 1, key: 'Exporter', top: 420, left: 120, width: 400, height: 20 },
-    { pageNo: 1, key: 'Tax Invoice No', top: 1150, left: 1350, width: 200, height: 25 },
-    { pageNo: 1, key: 'Tax Invoice Date', top: 1095, left: 1350, width: 150, height: 25 },
-    { pageNo: 2, key: 'GST No', top: 276, left: 440, width: 250, height: 20 },
-    { pageNo: 2, key: 'Consignee', top: 80, left: 100, width: 300, height: 20 },
-    { pageNo: 2, key: 'State of Origin', top: 500, left: 300, width: 200, height: 20 },
-    { pageNo: 2, key: 'District of Origin', top: 525, left: 300, width: 200, height: 20 },
-    { pageNo: 3, key: 'Consignee', top: 322, left: 110, width: 120, height: 20 },
-    { pageNo: 3, key: 'Buyer/Applicant', top: 322, left: 480, width: 120, height: 15 },
-    { pageNo: 3, key: 'Tax Invoice No', top: 325, left: 600, width: 200, height: 15 },
-    { pageNo: 3, key: 'Commission Payable', top: 140, left: 100, width: 150, height: 20 }
+    // Page 1
+    { pageNo: 1, key: 'IRN No', top: 310, left: 97, width: 1100, height: 50 },
+    { pageNo: 2, key: 'IRN No', top: 460, left: 180, width: 1100, height: 50 },
+    { pageNo: 3, key: 'IRN No', top: 460, left: 180, width: 1100, height: 50 },
+    { pageNo: 1, key: 'Exporter', top: 415, left: 122, width: 400, height: 20 },
+    { pageNo: 1, key: 'Consignee', top: 1405, left: 159, width: 300, height: 20 },
+    { pageNo: 1, key: 'Buyer/Applicant', top: 1407, left: 1088, width: 400, height: 20 },
+    { pageNo: 1, key: 'Tax Invoice No', top: 1408, left: 1815, width: 200, height: 25 },
+    { pageNo: 1, key: 'Tax Invoice Date', top: 1408, left: 1815, width: 400, height: 25 },
+    { pageNo: 1, key: 'Mode of Shipment', top: 1700, left: 117, width: 240, height: 40 },
+    { pageNo: 1, key: 'Airport of Loading', top: 1994, left: 696, width: 230, height: 40 },
+    { pageNo: 1, key: 'Airport of Discharge', top: 1993, left: 120, width: 255, height: 42 },
+    // Table Headers (approximations for reliable finding)
+    { pageNo: 1, key: 'Sales Order', top: 2390, left: 118, width: 160, height: 40 }, // Example
+    { pageNo: 1, key: 'No. &kind of pkgs', top: 2390, left: 400, width: 150, height: 80 }, // Example
+    { pageNo: 1, key: 'Description of Goods', top: 2390, left: 870, width: 300, height: 40 }, // Example
+    { pageNo: 1, key: 'Gross weight', top: 2390, left: 1460, width: 180, height: 80 }, // Example
+    { pageNo: 1, key: 'Quantity', top: 2390, left: 1690, width: 120, height: 40 }, // Example
+    { pageNo: 1, key: 'Amount', top: 2390, left: 2218, width: 120, height: 40 }, // Example
+    // Page 2
+    { pageNo: 2, key: 'Exporter', top: 538, left: 159, width: 400, height: 20 },
+    { pageNo: 2, key: 'GST No', top: 777, left: 1088, width: 350, height: 20 },
+    { pageNo: 2, key: 'Consignee', top: 894, left: 159, width: 300, height: 20 },
+    { pageNo: 2, key: 'Buyer/Applicant', top: 894, left: 1088, width: 400, height: 20 },
+    { pageNo: 2, key: 'Tax Invoice No', top: 895, left: 1814, width: 200, height: 25 },
+    { pageNo: 2, key: 'Tax Invoice Date', top: 895, left: 1814, width: 400, height: 25 },
+    { pageNo: 2, key: 'State of Origin', top: 1404, left: 619, width: 200, height: 20 },
+    { pageNo: 2, key: 'District of Origin', top: 1443, left: 620, width: 200, height: 20 },
+    // Page 2 Table Headers
+    { pageNo: 2, key: 'Sales Order', top: 1287, left: 118, width: 160, height: 40 },
+    { pageNo: 2, key: 'Description of Goods', top: 1286, left: 871, width: 300, height: 40 },
+    { pageNo: 2, key: 'Quantity', top: 1283, left: 1690, width: 120, height: 40 },
+    { pageNo: 2, key: 'Amount', top: 1286, left: 2219, width: 120, height: 40 },
+    // Page 3
+    { pageNo: 3, key: 'Consignee', top: 894, left: 161, width: 300, height: 20 },
+    { pageNo: 3, key: 'Buyer/Applicant', top: 894, left: 1088, width: 400, height: 20 },
+    { pageNo: 3, key: 'Tax Invoice No', top: 894, left: 1814, width: 200, height: 25 },
+    { pageNo: 3, key: 'Commission Payable', top: 1405, left: 159, width: 250, height: 20 }
   ];
 
   /** Dictionary of field names → possible keywords */
   private FIELD_KEYWORDS: { [field: string]: string[] } = {
-    invoiceNo: ["invoice no", "inv no", "ion no", "invoice number", "tax invoice no"],
-    invoiceDate: ["invoice date", "date", "dt", "tax invoice date"],
-    irnNo: ["irn no", "irn number", "irn"],
-    exporter: ["exporter", "seller"],
+    invoiceNo: ["invoice no", "inv no", "ion no", "invoice number", "tax invoice no", "bill no", "tax invoice no. & date"],
+    invoiceDate: ["invoice date", "date", "dt", "tax invoice date", "bill date", "tax invoice no. & date"],
+    irnNo: ["irn no", "irn number", "irn", "invoice reference number"],
+    cinNo: ["cin no", "cin"],
+    exporter: ["exporter", "seller", "supplier", "vendor name"],
     gstNo: ["gst no", "gstno", "gstin", "gst number", "gst"],
-    consignee: ["consignee", "buyer", "receiver", "buyer/applicant", "buyer applicant"]
+    consignee: ["consignee", "receiver", "customer"],
+    buyerApplicant: ["buyer/applicant", "buyer applicant", "buyer"],
+    countryOfOrigin: ["country of origin of goods", "country of origin"],
+    finalDestination: ["country of final destination", "final destination"],
+    stateOfOrigin: ["state of origin"],
+    districtOfOrigin: ["district of origin"],
+    modeOfShipment: ["mode of shipment"],
+    airportOfLoading: ["airport of loading"],
+    airportOfDischarge: ["airport of discharge"],
+    // Table fields from user request
+    salesOrder: ["sales order"],
+    description: ["description of goods", "description of goods table"],
+    noOfPackages: ["no of packages", "no. &kind of pkgs", "no & kind of pkgs", "no and kind of packages", "no. &kind"],
+    quantity: ["quantity", "display quantity"],
+    unit: ["unit"],
+    grossWeight: ["gross weight", "description of goods table gross weight"],
+    amount: ["description of goods table amount", "under description of goods table amount"],
   };
 
   constructor(private http: HttpClient) {}
+
+  /** Load sample JSON file from assets (cached) */
+  async loadSampleJson(): Promise<any> {
+    if (this.sampleJsonCache) return this.sampleJsonCache;
+    const jsonData = await firstValueFrom(
+      this.http.get<any>('assets/sample.json')
+    ).catch(() => null);
+    this.sampleJsonCache = jsonData || null;
+    return this.sampleJsonCache;
+  }
 
   /** Load JSON file from assets (cached) */
   async loadJson(fileName: string): Promise<any[]> {
@@ -55,7 +110,7 @@ export class MappingService {
 
   /** Load and parse CSV file (once only) */
   async loadCsv(file: File | string): Promise<void> {
-    if (this.csvData.length > 0) return;
+    if (this.csvLoaded) return;
 
     return new Promise((resolve, reject) => {
       if (typeof file === 'string') {
@@ -63,6 +118,7 @@ export class MappingService {
           .then(res => res.text())
           .then(csvText => {
             this.parseCsv(csvText);
+            this.csvLoaded = true;
             resolve();
           })
           .catch(err => reject(err));
@@ -72,6 +128,7 @@ export class MappingService {
           dynamicTyping: true,
           complete: (result: any) => {
             this.csvData = result.data;
+            this.csvLoaded = true;
             resolve();
           },
           error: (err: any) => reject(err)
@@ -86,8 +143,26 @@ export class MappingService {
     this.csvData = result.data;
   }
 
+  /** Normalizes a word object to have consistent coordinate properties. */
+  private normalizeWord(word: any): any {
+    const left = +(word.left || word.leftX || 0);
+    const top = +(word.top || word.topY || 0);
+    const right = +(word.right || word.rightX || 0);
+    const bottom = +(word.bottom || word.bottomY || 0);
+
+    return {
+      ...word,
+      left,
+      top,
+      right,
+      bottom,
+      width: right - left,
+      height: bottom - top,
+    };
+  }
+
   /**
-   * Get JSON entries from a selected box and add to mappings
+   * Enhanced method to find text in box using both JSON and CSV data
    */
   async findTextInBox(
     fileName: string,
@@ -98,8 +173,8 @@ export class MappingService {
   ): Promise<any[]> {
     const json = await this.loadJson(fileName);
 
-    // Filter entries inside the selection box
-    const results = json.filter(word =>
+    // Filter entries inside the selection box from JSON
+    const jsonResults = json.filter(word =>
       +word.pageNo === pageNo &&
       +word.left >= box.left &&
       +word.top >= box.top &&
@@ -107,15 +182,30 @@ export class MappingService {
       +word.bottom <= box.bottom
     );
 
+    // Also check CSV data for matches in the same area
+    let csvResults: any[] = [];
+    if (this.csvLoaded && this.csvData.length > 0) {
+      csvResults = this.csvData.filter((row: any) => {
+        return row.pageNo == pageNo &&
+               row.leftX >= box.left &&
+               row.topY >= box.top &&
+               row.rightX <= box.right &&
+               row.bottomY <= box.bottom;
+      });
+    }
+
+    // Combine results from both sources
+    const allResults = [...jsonResults, ...csvResults];
+
     // Map into structured JSON
-    const newEntries = results.map(word => ({
-      pageNo: +word.pageNo,
-      key: word.text,
-      value: word.text,
-      top: +word.top,
-      left: +word.left,
-      width: +word.right - +word.left,
-      height: +word.bottom - +word.top
+    const newEntries = allResults.map(item => ({
+      pageNo: +item.pageNo,
+      key: item.text || item.Name || 'Unknown',
+      value: item.text || item.Value || '',
+      top: +item.top || +item.topY || 0,
+      left: +item.left || +item.leftX || 0,
+      width: ((+item.right || +item.rightX || 0) - (+item.left || +item.leftX || 0)),
+      height: ((+item.bottom || +item.bottomY || 0) - (+item.top || +item.topY || 0))
     }));
 
     // Add new mappings if not already present
@@ -138,113 +228,435 @@ export class MappingService {
   }
 
   /**
-   * Extract a single field from prompt (existing method)
+   * Enhanced method to extract a single field from prompt
    */
   async extractFieldFromPrompt(
     prompt: string,
     fileName: string,
-    pageNo: number
+    docPageNo: number
   ): Promise<any | null> {
-    const json = await this.loadJson(fileName);
-    if (!json || json.length === 0) return null;
+    const rawJson = await this.loadJson(fileName);
+    let result: any = null;
+    if (!rawJson || rawJson.length === 0) return null;
+
+    const json = rawJson.map(w => this.normalizeWord(w));
 
     const normalized = prompt.toLowerCase().replace(/extract\s*/g, "").trim();
 
+    // Find the best field match based on the longest keyword.
+    // This prevents "description" from matching when the prompt is "extract amount from description of goods".
     let targetField: string | null = null;
+    let bestMatchPos = -1;
+
     for (const [field, keywords] of Object.entries(this.FIELD_KEYWORDS)) {
-      if (keywords.some(k => normalized.includes(k))) {
-        targetField = field;
-        break;
+      // Check keywords and the field name itself. Prioritize the one that appears latest in the prompt.
+      const allKeywords = [...keywords, field.toLowerCase()];
+      for (const keyword of allKeywords) {
+        const pos = normalized.lastIndexOf(keyword);
+        if (pos > bestMatchPos) {
+          bestMatchPos = pos;
+          targetField = field;
+        }
       }
     }
+
     if (!targetField) return null;
 
-    // Find a word on the page that matches any keyword for the target field
-    const pageWords = json.filter(w => +w.pageNo === pageNo);
-    const candidate = pageWords.find(word =>
-      this.FIELD_KEYWORDS[targetField!].some(k => word.text?.toLowerCase().includes(k))
+    const jsonPageNo = 0;
+
+    // Special handling for 'unit' as it has no header and is next to quantity.
+    if (targetField === 'unit') {
+      const pageWords = json.filter(w => +w.pageNo === jsonPageNo);
+      const quantityHeader = pageWords.find(w => this.FIELD_KEYWORDS['quantity'].some(k => w.text?.toLowerCase().includes(k)));
+      if (quantityHeader) {
+        // We're looking for 'unit', but we use 'quantity' header as the anchor.
+        result = this.extractFieldValue(quantityHeader, pageWords, 'unit', jsonPageNo);
+      }
+    }
+
+    // Special handling for table-based queries to provide context.
+    // This allows finding a field relative to another field (the table header).
+    const tableContextFields = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'description', 'unit'];
+    if (normalized.includes('description of goods') && tableContextFields.includes(targetField)) {
+      const tableColumnNames: { [key: string]: string[] } = {
+        amount: ['amount'],
+        grossWeight: ['gross weight'],
+        quantity: ['quantity'],
+        salesOrder: ['sales order'],
+        noOfPackages: ['no. &kind of pkgs', 'no. &kind'],
+        description: ['description of goods'],
+        unit: ['unit']
+      };
+
+      const pageWords = json.filter(w => +w.pageNo === jsonPageNo);
+      // Find the "Description of Goods" header to anchor our search.
+      const tableHeader = pageWords.find(w => w.text?.toLowerCase().includes('description of goods'));
+      if (tableHeader) {
+        const searchKeys = tableColumnNames[targetField];
+        const columnHeader = searchKeys ? pageWords.find(w =>
+          searchKeys.some(sk => w.text?.toLowerCase().includes(sk)) &&
+          Math.abs(w.top - tableHeader.top) < 50
+        ) : null;
+        if (columnHeader) {
+          result = this.extractFieldValue(columnHeader, pageWords, targetField, jsonPageNo);
+        }
+      }
+    }
+
+    if (!result) {
+      // First, check if we have a predefined mapping for this field
+      const predefinedMapping = this.mappings.find(m =>
+        m.pageNo === docPageNo && this.FIELD_KEYWORDS[targetField!].some(k =>
+          m.key.toLowerCase().includes(k)
+        )
+      );
+
+      if (predefinedMapping) {
+        // Try to find the value near the predefined mapping coordinates
+        const res = await this.findValueNearCoordinates(predefinedMapping, json, jsonPageNo, targetField!);
+        if (res) {
+          result = res;
+        }
+      }
+
+      // If no predefined mapping or if it failed, search through all words on the page
+      if (!result) {
+        const pageWords = json.filter(w => +w.pageNo === jsonPageNo);
+        const sortedKeywords = [...this.FIELD_KEYWORDS[targetField!]].sort((a, b) => b.length - a.length);
+
+        let candidate = null;
+        for (const keyword of sortedKeywords) {
+            candidate = pageWords.find(word => word.text?.toLowerCase().includes(keyword));
+            if (candidate) break;
+        }
+
+        if (candidate) {
+          result = this.extractFieldValue(candidate, pageWords, targetField!, jsonPageNo);
+        }
+      }
+    }
+
+    if (!result) return null;
+    result.pageNo = docPageNo;
+
+    // If no value was found for IRN on a page other than 1, check page 1.
+    if (targetField === 'irnNo' && !result.value && docPageNo > 1) {
+      const page1Json = await this.loadJson('json/file1');
+      if (page1Json && page1Json.length > 0) {
+        const page1Result = await this.extractFieldFromPrompt(prompt, 'json/file1', 1);
+        if (page1Result && page1Result.value) {
+          result.value = page1Result.value;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Helper method to find value near predefined coordinates
+   */
+  private async findValueNearCoordinates(
+    mapping: any,
+    json: any[],
+    pageNo: number,
+    targetField: string
+  ): Promise<any> {
+    const pageWords = json.filter(w => +w.pageNo === pageNo); // pageNo is jsonPageNo
+
+    // Find all words that could be the label based on keywords.
+    const candidates = pageWords.filter(word =>
+      this.FIELD_KEYWORDS[targetField].some(k => word.text?.toLowerCase().includes(k))
     );
-    if (!candidate) return null;
+
+    if (candidates.length === 0) {
+      return null; // No words with the right keywords found on the page.
+    }
+
+    // Find the candidate closest to the predefined mapping's coordinates.
+    let bestCandidate = null;
+    let minDistance = Infinity;
+
+    for (const candidate of candidates) {
+      const distance = Math.hypot(candidate.left - mapping.left, candidate.top - mapping.top);
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestCandidate = candidate;
+      }
+    }
+
+    // If the best candidate is too far, it's probably not the right one.
+    const MAX_DISTANCE = 200; // pixels
+    if (minDistance > MAX_DISTANCE) {
+      return null;
+    }
+
+    return this.extractFieldValue(bestCandidate, pageWords, targetField, pageNo);
+  }
+
+  /**
+   * Helper method to extract field value from a candidate word
+   */
+  private extractFieldValue(
+    candidate: any, pageWords: any[], targetField: string, pageNo: number
+  ): any {
+    // Special handling for multi-line headers like "No. &kind of pkgs"
+    if (targetField === 'noOfPackages' && candidate.text?.toLowerCase().includes('no. &kind')) {
+      const secondPart = pageWords.find(w =>
+        w.text?.toLowerCase().includes('of pkgs') &&
+        Math.abs(w.left - candidate.left) < 50 && // Allow some horizontal variance
+        w.top > candidate.bottom && w.top < candidate.bottom + 20 // Must be directly below
+      );
+      if (secondPart) {
+        // Combine the two parts into a new virtual candidate for label and coordinate purposes
+        const combinedCandidate = {
+          ...candidate,
+          text: `${candidate.text} ${secondPart.text}`,
+          bottom: secondPart.bottom,
+          right: Math.max(candidate.right, secondPart.right)
+        };
+        // Overwrite the original candidate for the rest of the function
+        candidate = combinedCandidate;
+      }
+    }
 
     // If the candidate itself contains a label and value (e.g., "GSTNo: 27AAAC..."), split it
     let parsedKey = candidate.text;
     let parsedValue = "";
-    const colonIdx = candidate.text.indexOf(":");
-    if (colonIdx > 0 && colonIdx < candidate.text.length - 1) {
-      parsedKey = candidate.text.slice(0, colonIdx).trim();
-      parsedValue = candidate.text.slice(colonIdx + 1).trim();
+    let valueCoords: { left: number; top: number; right: number; bottom: number } | undefined;
+    let labelCoords = {
+        left: +candidate.left,
+        top: +candidate.top,
+        right: +candidate.right,
+        bottom: +candidate.bottom
+    };
+
+    console.log('Candidate text:', candidate.text);
+
+    const colonIdx = parsedKey.indexOf(":");
+    if (colonIdx > 0) {
+      const potentialValue = parsedKey.slice(colonIdx + 1).trim();
+      const originalKey = parsedKey.slice(0, colonIdx).trim();
+
+      if (potentialValue) {
+        parsedValue = potentialValue;
+        parsedKey = originalKey;
+
+        // Estimate coordinates for key and value
+        const totalWidth = +candidate.right - +candidate.left;
+        const totalLength = candidate.text.length;
+        if (totalLength > 0) {
+            const charWidth = totalWidth / totalLength;
+            const valueStartIndex = candidate.text.toLowerCase().indexOf(parsedValue.toLowerCase());
+            const keyEndIndex = candidate.text.toLowerCase().indexOf(parsedKey.toLowerCase()) + parsedKey.length;
+
+            if (valueStartIndex > -1 && keyEndIndex > -1) {
+                const keyRight = +candidate.left + (keyEndIndex * charWidth);
+                const valueLeft = +candidate.left + (valueStartIndex * charWidth);
+
+                labelCoords.right = keyRight;
+                valueCoords = {
+                    left: valueLeft,
+                    top: +candidate.top,
+                    right: +candidate.right,
+                    bottom: +candidate.bottom
+                };
+            }
+        }
+      }
+    }
+    console.log('Parsed key:', parsedKey);
+    console.log('Parsed value:', parsedValue);
+
+    // If no value found yet, search for text directly below the candidate
+    if (!parsedValue) {
+      const isTableField = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'description', 'unit'].includes(targetField);
+      const verticalThreshold = 150; // How far down to look
+      const horizontalTolerance = 100;
+
+      // Find all words that could potentially be the value below the label
+      const potentialWords = pageWords
+        .filter(w => {
+          if (w === candidate || +w.top < +candidate.bottom - 10 || +w.top >= (+candidate.bottom + verticalThreshold)) {
+            return false;
+          }
+          // For table fields, check for horizontal overlap. For others, use center-based alignment.
+          if (isTableField) {
+            if (targetField === 'description') {
+                const searchBoxCenterX = (candidate.left + candidate.right) / 2;
+                // Description can be wide, so use a wider tolerance and center-based check.
+                return Math.abs(((+w.left + +w.right) / 2) - searchBoxCenterX) < 500;
+            }
+            return Math.max(w.left, candidate.left) < Math.min(w.right, candidate.right);
+          } else {
+            // For address blocks (exporter/consignee), allow a wider horizontal tolerance when searching below.
+            if (targetField !== 'exporter' && targetField !== 'consignee') {
+              return false; // Don't search below for non-address, non-table fields like IRN No.
+            }
+            const customHorizontalTolerance = 300;
+            const searchBoxCenterX = (candidate.left + candidate.right) / 2;
+            return Math.abs(((+w.left + +w.right) / 2) - searchBoxCenterX) < customHorizontalTolerance;
+          }
+        })
+        .sort((a, b) => {
+            const topDiff = +a.top - +b.top;
+            if (Math.abs(topDiff) > 5) return topDiff; // Stricter line diff
+            return +a.left - +b.left; // Sort by left position on the same line
+        });
+
+      if (potentialWords.length > 0) {
+        const firstWord = potentialWords[0];
+        // Group all words on the same line as the first potential word
+        const lineWords = potentialWords.filter(w => Math.abs(+w.top - +firstWord.top) < 15)
+                        .sort((a, b) => +a.left - +b.left);
+
+        let valueSet = false;
+        // Special handling for amount to combine value and currency from different lines
+        if (targetField === 'amount' && potentialWords.length > 0) {
+            const numericWord = potentialWords.find(w => !isNaN(parseFloat(w.text)));
+            const currencyWord = potentialWords.find(w => /^(eur|usd|\$|€)$/i.test(w.text));
+            if (numericWord && currencyWord) {
+                parsedValue = `${numericWord.text} ${currencyWord.text}`;
+                const l = Math.min(numericWord.left, currencyWord.left);
+                const t = Math.min(numericWord.top, currencyWord.top);
+                const r = Math.max(numericWord.right, currencyWord.right);
+                const b = Math.max(numericWord.bottom, currencyWord.bottom);
+                valueCoords = { left: l, top: t, right: r, bottom: b };
+                valueSet = true;
+            }
+        }
+
+        // Special parsing for table fields that can be combined (e.g., quantity and unit)
+        if (!valueSet && isTableField && (targetField === 'quantity' || targetField === 'unit' || targetField === 'grossWeight')) {
+          const numericWord = lineWords.find(w => !isNaN(parseFloat(w.text)));
+          const textWord = lineWords.find(w => isNaN(parseFloat(w.text)) && /^[a-zA-Z]+$/.test(w.text));
+
+          if (targetField === 'quantity' && numericWord) {
+            parsedValue = String(parseFloat(numericWord.text));
+            const { left, top, right, bottom } = numericWord;
+            valueCoords = { left, top, right, bottom };
+            valueSet = true;
+          } else if (targetField === 'unit' && textWord) {
+            parsedValue = textWord.text;
+            const { left, top, right, bottom } = textWord;
+            valueCoords = { left, top, right, bottom };
+            valueSet = true;
+          } else if (targetField === 'grossWeight' && numericWord && textWord) {
+            parsedValue = `${numericWord.text} ${textWord.text}`;
+            const l = Math.min(numericWord.left, textWord.left);
+            const t = Math.min(numericWord.top, textWord.top);
+            const r = Math.max(numericWord.right, textWord.right);
+            const b = Math.max(numericWord.bottom, textWord.bottom);
+            valueCoords = { left: l, top: t, right: r, bottom: b };
+            valueSet = true;
+          }
+        }
+
+        if (!valueSet && lineWords.length > 0) {
+          parsedValue = lineWords.map(w => w.text).join(' ').trim();
+            const l = Math.min(...lineWords.map(w => +w.left));
+            const t = Math.min(...lineWords.map(w => +w.top));
+            const r = Math.max(...lineWords.map(w => +w.right));
+            const b = Math.max(...lineWords.map(w => +w.bottom));
+            valueCoords = { left: l, top: t, right: r, bottom: b };
+        }
+      }
+    }
+
+    if (targetField === 'salesOrder' && parsedValue) {
+      parsedValue = parsedValue.replace(/\s+\/\s*$/, '').trim();
     }
 
     // Otherwise, search to the right in the same horizontal band
     if (!parsedValue) {
       const bandTol = 18;
       const searchLeft = +candidate.right + 1;
-      const searchRight = searchLeft + 1400;
+      const searchRight = searchLeft + 2000; // Increased search distance
       const searchTop = +candidate.top - bandTol;
       const searchBottom = +candidate.bottom + bandTol;
+
       const rightWords = pageWords
-        .filter(w => +w.left >= searchLeft && +w.left <= searchRight && !(+w.bottom < searchTop || +w.top > searchBottom))
+        .filter(w => +w.left >= searchLeft &&
+                    +w.left <= searchRight &&
+                    !(+w.bottom < searchTop || +w.top > searchBottom))
         .sort((a, b) => +a.left - +b.left);
+
       parsedValue = rightWords.map(w => w.text).join(' ').trim();
+
+      if (rightWords.length) {
+        const l = Math.min(...rightWords.map(w => +w.left));
+        const t = Math.min(...rightWords.map(w => +w.top));
+        const r = Math.max(...rightWords.map(w => +w.right));
+        const b = Math.max(...rightWords.map(w => +w.bottom));
+        valueCoords = { left: l, top: t, right: r, bottom: b };
+      }
+    }
+
+    // If we still don't have a value, try to use CSV data if available
+    if (!parsedValue && this.csvLoaded) {
+      const csvMatch = this.csvData.find((row: any) => {
+        const rowPage = +row.pageNo || +row.PageNo || 0;
+        const rowName = (row.Name || '').toLowerCase();
+        return rowPage === pageNo &&
+               this.FIELD_KEYWORDS[targetField].some(k => rowName.includes(k));
+      });
+
+      if (csvMatch) {
+        parsedValue = csvMatch.Value || '';
+      }
     }
 
     return {
       field: targetField,
       key: parsedKey,
       value: parsedValue,
-      coords: {
-        left: +candidate.left,
-        top: +candidate.top,
-        right: +candidate.right,
-        bottom: +candidate.bottom
-      },
+      valueCoords,
+      coords: labelCoords,
       pageNo
     };
   }
 
-  /**
-   * Extract all fields for a page based on prompt (new method)
-   * Example: "irn no" → returns full field setup for the page
-   */
-  async extractFieldsByPrompt(
-    prompt: string,
-    fileName: string,
-    pageNo: number
-  ): Promise<{ [key: string]: any } | null> {
-    const json = await this.loadJson(fileName);
-    if (!json || json.length === 0) return null;
+  public async extractFromSampleJson(prompt: string): Promise<any | null> {
+    const sampleJson = await this.loadSampleJson();
+    if (!sampleJson) return null;
 
-    const normalized = prompt.toLowerCase().trim();
+    const normalizedPrompt = prompt.toLowerCase().replace(/extract\s*/g, "").replace(/[^a-z0-9]/g, '').trim();
 
-    // Determine target field from keywords
-    let targetField: string | null = null;
-    for (const [field, keywords] of Object.entries(this.FIELD_KEYWORDS)) {
-      if (keywords.some(k => normalized.includes(k))) {
-        targetField = field;
-        break;
+    for (const key in sampleJson) {
+      const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (normalizedPrompt.includes(normalizedKey)) {
+        const value = sampleJson[key];
+        const valueStr = (typeof value === 'object') ? JSON.stringify(value) : value.toString();
+
+        return {
+          field: key,
+          key: key,
+          value: valueStr,
+          pageNo: 1,
+          coords: null,
+          valueCoords: null
+        };
       }
     }
-    if (!targetField) return null;
 
-    // ✅ First: use predefined mappings for the page
-    const pageMappings = this.mappings.filter(m => m.pageNo === pageNo);
-    if (pageMappings.length > 0) {
-      const fieldSetup: { [key: string]: any } = {};
-      pageMappings.forEach(m => {
-        fieldSetup[m.key] = m.value || ""; // placeholder, can replace with JSON lookup
-      });
-      return fieldSetup;
-    }
+    return null;
+  }
 
-    // 🔍 Fallback: use JSON
-    const pageData = json.filter(word => +word.pageNo === pageNo);
-    if (pageData.length === 0) return null;
+  /**
+   * Method to get field value from CSV data
+   */
+  private getFieldValueFromCsv(fieldName: string, pageNo: number): string {
+    if (!this.csvLoaded) return '';
 
-    const fieldSetup: { [key: string]: any } = {};
-    pageData.forEach(word => {
-      fieldSetup[word.text] = word.text;
+    const match = this.csvData.find((row: any) => {
+      const rowPage = +row.pageNo || +row.PageNo || 0;
+      const rowName = (row.Name || '').toLowerCase();
+      const fieldKeywords = this.FIELD_KEYWORDS[fieldName] || [];
+
+      return rowPage === pageNo &&
+             fieldKeywords.some(k => rowName.includes(k));
     });
 
-    return fieldSetup;
+    return match ? (match.Value || '') : '';
   }
 }
