@@ -46,7 +46,7 @@ export class PdfConfig implements OnInit {
   private tableFields = [
     'salesOrder',
     'noOfPackages',
-    'description',
+    'descriptionOfGoods',
     'quantity',
     'unit',
     'grossWeight',
@@ -128,13 +128,13 @@ export class PdfConfig implements OnInit {
     const fileName = `json/file${this.currentPage}`;
 
     // Special case for showing all table fields
-    if (normalizedPrompt === 'description of goods table') {
+    if (normalizedPrompt === 'items table') {
       // Let the parent component know to clear existing highlights
       this.highlightRequested.emit({ clearAll: true });
 
       for (const field of this.tableFields) {
         // Use a more specific prompt for each field to help the mapping service
-        const fieldPrompt = `description of goods table ${field}`;
+        const fieldPrompt = `items table ${field}`;
         const result = await this.mappingService.extractFieldFromPrompt(
           fieldPrompt,
           fileName,
@@ -163,16 +163,26 @@ export class PdfConfig implements OnInit {
     );
 
     if (result) {
+      // If the extracted field is a table field, update its value in the UI
+      const tableToUpdate = this.tables.find(table => 
+        table.rows.some(row => row.key === result.field)
+      );
+      if (tableToUpdate) {
+        const rowToUpdate = tableToUpdate.rows.find(row => row.key === result.field);
+        if (rowToUpdate) {
+          rowToUpdate.value = result.value;
+        }
+      }
+
       // Autofill Field Setup
       // Use the canonical field name from the service
       this.fieldName = result.field || this.fieldName;
       this.displayName = result.field || this.displayName;
       this.instruction = `Extract ${this.fieldName}`;
 
-      // Check if the extracted field is a table field
       if (this.tableFields.includes(result.field)) {
         this.fieldType = 'Table';
-        this.tableName = 'description of goods';
+        this.tableName = tableToUpdate ? tableToUpdate.name.replace(' table', '') : 'items';
         this.category = 'Table Details';
       } else {
         this.fieldType = 'Header';

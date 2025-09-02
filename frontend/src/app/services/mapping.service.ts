@@ -73,12 +73,12 @@ export class MappingService {
     airportOfDischarge: ["airport of discharge"],
     // Table fields from user request
     salesOrder: ["sales order"],
-    description: ["description of goods", "description of goods table"],
-    noOfPackages: ["no of packages", "no. &kind of pkgs", "no & kind of pkgs", "no and kind of packages", "no. &kind"],
+    descriptionOfGoods: ["description of goods"],
+    noOfPackages: ["no of packages", "no. &kind of pkgs", "no & kind of pkgs", "no and kind of packages", "no. &kind", "no. of packages"],
     quantity: ["quantity", "display quantity"],
     unit: ["unit"],
-    grossWeight: ["gross weight", "description of goods table gross weight"],
-    amount: ["description of goods table amount", "under description of goods table amount"],
+    grossWeight: ["gross weight", "items table gross weight"],
+    amount: ["items table amount", "under items table amount"],
   };
 
   constructor(private http: HttpClient) {}
@@ -241,7 +241,7 @@ export class MappingService {
 
     const json = rawJson.map(w => this.normalizeWord(w));
 
-    const normalized = prompt.toLowerCase().replace(/extract\s*/g, "").trim();
+    const normalized = prompt.toLowerCase().replace(/^(extract|fetch)\s*/g, "").trim();
 
     // Find the best field match based on the longest keyword.
     // This prevents "description" from matching when the prompt is "extract amount from description of goods".
@@ -276,8 +276,8 @@ export class MappingService {
 
     // Special handling for table-based queries to provide context.
     // This allows finding a field relative to another field (the table header).
-    const tableContextFields = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'description', 'unit'];
-    if (normalized.includes('description of goods') && tableContextFields.includes(targetField)) {
+    const tableContextFields = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'descriptionOfGoods', 'unit'];
+    if ((normalized.includes('items table') || normalized.includes('description of goods')) && tableContextFields.includes(targetField)) {
       const tableColumnNames: { [key: string]: string[] } = {
         amount: ['amount'],
         grossWeight: ['gross weight'],
@@ -470,19 +470,19 @@ export class MappingService {
 
     // If no value found yet, search for text directly below the candidate
     if (!parsedValue) {
-      const isTableField = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'description', 'unit'].includes(targetField);
+      const isTableField = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'descriptionOfGoods', 'unit'].includes(targetField);
       const verticalThreshold = 150; // How far down to look
       const horizontalTolerance = 100;
 
       // Find all words that could potentially be the value below the label
       const potentialWords = pageWords
         .filter(w => {
-          if (w === candidate || +w.top < +candidate.bottom - 10 || +w.top >= (+candidate.bottom + verticalThreshold)) {
+          if (w === candidate || +w.top < +candidate.bottom - 5 || +w.top >= (+candidate.bottom + verticalThreshold)) {
             return false;
           }
           // For table fields, check for horizontal overlap. For others, use center-based alignment.
           if (isTableField) {
-            if (targetField === 'description') {
+            if (targetField === 'descriptionOfGoods') {
                 const searchBoxCenterX = (candidate.left + candidate.right) / 2;
                 // Description can be wide, so use a wider tolerance and center-based check.
                 return Math.abs(((+w.left + +w.right) / 2) - searchBoxCenterX) < 500;
