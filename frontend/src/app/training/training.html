@@ -18,7 +18,8 @@
               [originalData]="originalData"
               [jsonData]="jsonData"
               [currentPage]="1"
-              [highlights]="highlights">
+              [highlights]="highlights"
+              (pageChanged)="handlePageChange($event)">
             </app-pdf-overlay>
           </div>
         </ng-container>

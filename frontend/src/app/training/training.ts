@@ -125,6 +125,10 @@ export class Training implements OnInit, OnDestroy {
   handleFieldConfigChange(config: any) { console.log('Field config changed:', config); }
   handleActionTriggered(action: string) { console.log('Action triggered:', action); }
 
+  handlePageChange(pageNo: number) {
+    this.currentPageForConfig = pageNo;
+  }
+
   handleHighlight(evt: any) {
     // Handle special event to clear all highlights
     if (evt && evt.clearAll) {

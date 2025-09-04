@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class MappingService {
   private jsonCache: { [fileName: string]: any[] } = {};
-  private sampleJsonCache: any = null;
+  private sampleJsonCache: { [page: number]: any } = {};
   private csvData: any[] = [];
   private csvLoaded: boolean = false;
 
@@ -59,12 +59,12 @@ export class MappingService {
     invoiceNo: ["invoice no", "inv no", "ion no", "invoice number", "tax invoice no", "bill no", "tax invoice no. & date"],
     invoiceDate: ["invoice date", "date", "dt", "tax invoice date", "bill date", "tax invoice no. & date"],
     irnNo: ["irn no", "irn number", "irn", "invoice reference number"],
-    cinNo: ["cin no", "cin"],
-    exporter: ["exporter", "seller", "supplier", "vendor name"],
+    cinNo: ["cin no", "cin"], // Not in sample.json, but might be in others
+    supplierName: ["exporter", "seller", "supplier", "vendor name", "supplier name"],
+    importerName: ["consignee", "receiver", "customer", "importer name"],
     gstNo: ["gst no", "gstno", "gstin", "gst number", "gst"],
-    consignee: ["consignee", "receiver", "customer"],
-    buyerApplicant: ["buyer/applicant", "buyer applicant", "buyer"],
-    countryOfOrigin: ["country of origin of goods", "country of origin"],
+    buyerApplicant: ["buyer/applicant", "buyer applicant", "buyer"], // Not in sample.json
+    countryOfOrigin: ["country of origin of goods", "country of origin","countryOfOrigin"],
     finalDestination: ["country of final destination", "final destination"],
     stateOfOrigin: ["state of origin"],
     districtOfOrigin: ["district of origin"],
@@ -77,20 +77,27 @@ export class MappingService {
     noOfPackages: ["no of packages", "no. &kind of pkgs", "no & kind of pkgs", "no and kind of packages", "no. &kind", "no. of packages"],
     quantity: ["quantity", "display quantity"],
     unit: ["unit"],
-    grossWeight: ["gross weight", "items table gross weight"],
-    amount: ["items table amount", "under items table amount"],
+    TotalGrossWeight: ["gross weight", "items table gross weight", "total gross weight"],
+    TotalNetWeight: ["net weight", "total net weight"],
+    amount: ["amount", "items table amount", "under items table amount"],
   };
 
   constructor(private http: HttpClient) {}
 
   /** Load sample JSON file from assets (cached) */
   async loadSampleJson(): Promise<any> {
-    if (this.sampleJsonCache) return this.sampleJsonCache;
-    const jsonData = await firstValueFrom(
-      this.http.get<any>('assets/sample.json')
-    ).catch(() => null);
-    this.sampleJsonCache = jsonData || null;
-    return this.sampleJsonCache;
+    return this.loadSampleJsonForPage(1);
+  }
+
+  /** Load sample JSON file for a specific page from assets (cached) */
+  async loadSampleJsonForPage(page: number): Promise<any> {
+    if (this.sampleJsonCache[page]) {
+      return this.sampleJsonCache[page];
+    }
+    const fileName = `assets/sample${page > 1 ? page : ''}.json`;
+    const jsonData = await firstValueFrom(this.http.get<any>(fileName)).catch(() => null);
+    this.sampleJsonCache[page] = jsonData;
+    return jsonData;
   }
 
   /** Load JSON file from assets (cached) */
@@ -249,8 +256,10 @@ export class MappingService {
     let bestMatchPos = -1;
 
     for (const [field, keywords] of Object.entries(this.FIELD_KEYWORDS)) {
-      // Check keywords and the field name itself. Prioritize the one that appears latest in the prompt.
-      const allKeywords = [...keywords, field.toLowerCase()];
+      // Check keywords, the field name itself (as-is and de-camel-cased).
+      // Prioritize the one that appears latest in the prompt.
+      const decamelized = field.replace(/([A-Z])/g, ' $1').toLowerCase();
+      const allKeywords = [...new Set([...keywords, field.toLowerCase(), decamelized])];
       for (const keyword of allKeywords) {
         const pos = normalized.lastIndexOf(keyword);
         if (pos > bestMatchPos) {
@@ -271,35 +280,6 @@ export class MappingService {
       if (quantityHeader) {
         // We're looking for 'unit', but we use 'quantity' header as the anchor.
         result = this.extractFieldValue(quantityHeader, pageWords, 'unit', jsonPageNo);
-      }
-    }
-
-    // Special handling for table-based queries to provide context.
-    // This allows finding a field relative to another field (the table header).
-    const tableContextFields = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'descriptionOfGoods', 'unit'];
-    if ((normalized.includes('items table') || normalized.includes('description of goods')) && tableContextFields.includes(targetField)) {
-      const tableColumnNames: { [key: string]: string[] } = {
-        amount: ['amount'],
-        grossWeight: ['gross weight'],
-        quantity: ['quantity'],
-        salesOrder: ['sales order'],
-        noOfPackages: ['no. &kind of pkgs', 'no. &kind'],
-        description: ['description of goods'],
-        unit: ['unit']
-      };
-
-      const pageWords = json.filter(w => +w.pageNo === jsonPageNo);
-      // Find the "Description of Goods" header to anchor our search.
-      const tableHeader = pageWords.find(w => w.text?.toLowerCase().includes('description of goods'));
-      if (tableHeader) {
-        const searchKeys = tableColumnNames[targetField];
-        const columnHeader = searchKeys ? pageWords.find(w =>
-          searchKeys.some(sk => w.text?.toLowerCase().includes(sk)) &&
-          Math.abs(w.top - tableHeader.top) < 50
-        ) : null;
-        if (columnHeader) {
-          result = this.extractFieldValue(columnHeader, pageWords, targetField, jsonPageNo);
-        }
       }
     }
 
@@ -470,7 +450,7 @@ export class MappingService {
 
     // If no value found yet, search for text directly below the candidate
     if (!parsedValue) {
-      const isTableField = ['amount', 'grossWeight', 'quantity', 'salesOrder', 'noOfPackages', 'descriptionOfGoods', 'unit'].includes(targetField);
+      const isTableField = ['amount', 'TotalGrossWeight', 'TotalNetWeight', 'quantity', 'salesOrder', 'noOfPackages', 'descriptionOfGoods', 'unit'].includes(targetField);
       const verticalThreshold = 150; // How far down to look
       const horizontalTolerance = 100;
 
@@ -480,6 +460,9 @@ export class MappingService {
           if (w === candidate || +w.top < +candidate.bottom - 5 || +w.top >= (+candidate.bottom + verticalThreshold)) {
             return false;
           }
+          // Fields that are typically on a single line with their value after a colon.
+          const singleLineFields = ['irnNo', 'cinNo', 'gstNo'];
+
           // For table fields, check for horizontal overlap. For others, use center-based alignment.
           if (isTableField) {
             if (targetField === 'descriptionOfGoods') {
@@ -489,11 +472,11 @@ export class MappingService {
             }
             return Math.max(w.left, candidate.left) < Math.min(w.right, candidate.right);
           } else {
-            // For address blocks (exporter/consignee), allow a wider horizontal tolerance when searching below.
-            if (targetField !== 'exporter' && targetField !== 'consignee') {
-              return false; // Don't search below for non-address, non-table fields like IRN No.
+            // For most header fields (like addresses), search below. Exclude specific single-line fields.
+            if (singleLineFields.includes(targetField)) {
+              return false;
             }
-            const customHorizontalTolerance = 300;
+            const customHorizontalTolerance = 350; // Wider tolerance for address blocks etc.
             const searchBoxCenterX = (candidate.left + candidate.right) / 2;
             return Math.abs(((+w.left + +w.right) / 2) - searchBoxCenterX) < customHorizontalTolerance;
           }
@@ -512,7 +495,7 @@ export class MappingService {
 
         let valueSet = false;
         // Special handling for amount to combine value and currency from different lines
-        if (targetField === 'amount' && potentialWords.length > 0) {
+        if (targetField === 'amount' && potentialWords.length > 1) {
             const numericWord = potentialWords.find(w => !isNaN(parseFloat(w.text)));
             const currencyWord = potentialWords.find(w => /^(eur|usd|\$|€)$/i.test(w.text));
             if (numericWord && currencyWord) {
@@ -527,7 +510,7 @@ export class MappingService {
         }
 
         // Special parsing for table fields that can be combined (e.g., quantity and unit)
-        if (!valueSet && isTableField && (targetField === 'quantity' || targetField === 'unit' || targetField === 'grossWeight')) {
+        if (!valueSet && isTableField && (targetField === 'quantity' || targetField === 'unit' || targetField === 'TotalGrossWeight' || targetField === 'TotalNetWeight')) {
           const numericWord = lineWords.find(w => !isNaN(parseFloat(w.text)));
           const textWord = lineWords.find(w => isNaN(parseFloat(w.text)) && /^[a-zA-Z]+$/.test(w.text));
 
@@ -541,7 +524,7 @@ export class MappingService {
             const { left, top, right, bottom } = textWord;
             valueCoords = { left, top, right, bottom };
             valueSet = true;
-          } else if (targetField === 'grossWeight' && numericWord && textWord) {
+          } else if ((targetField === 'TotalGrossWeight' || targetField === 'TotalNetWeight') && numericWord && textWord) {
             parsedValue = `${numericWord.text} ${textWord.text}`;
             const l = Math.min(numericWord.left, textWord.left);
             const t = Math.min(numericWord.top, textWord.top);
@@ -645,18 +628,5 @@ export class MappingService {
   /**
    * Method to get field value from CSV data
    */
-  private getFieldValueFromCsv(fieldName: string, pageNo: number): string {
-    if (!this.csvLoaded) return '';
-
-    const match = this.csvData.find((row: any) => {
-      const rowPage = +row.pageNo || +row.PageNo || 0;
-      const rowName = (row.Name || '').toLowerCase();
-      const fieldKeywords = this.FIELD_KEYWORDS[fieldName] || [];
-
-      return rowPage === pageNo &&
-             fieldKeywords.some(k => rowName.includes(k));
-    });
-
-    return match ? (match.Value || '') : '';
-  }
+  
 }

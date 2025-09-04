@@ -15,6 +15,7 @@ export class DocumentAnalyzerComponent {
   userPrompt: string = '';
   extractedField: any = null;
 
+
   // Bound inputs for PdfConfig
   configPrompt: string = '';
   configFieldName: string = 'Title';

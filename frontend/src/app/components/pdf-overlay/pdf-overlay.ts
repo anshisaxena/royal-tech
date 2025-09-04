@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, HostListener } from '@angular/core';
+import { Component, Input, OnInit, HostListener, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
@@ -27,6 +27,7 @@ export class PdfOverlayComponent implements OnInit {
   @Input() currentPage: number = 1;
   @Input() highlights: Array<{ pageNo: number; key: string; labelText?: string; value: string; labelBox?: { left: number; top: number; right: number; bottom: number }; valueBox?: { left: number; top: number; right: number; bottom: number } }> = [];
   @Input() showHighlights: boolean = true;
+  @Output() pageChanged = new EventEmitter<number>();
 
   fieldMapping: any[] = [];
   editedFields = new Set<string>();
@@ -76,6 +77,7 @@ export class PdfOverlayComponent implements OnInit {
   onPageChange(pageNo: number) {
     this.currentPage = pageNo;
     this.updatePageFields();
+    this.pageChanged.emit(pageNo);
     setTimeout(() => this.updatePdfScale(), 100);
   }
 

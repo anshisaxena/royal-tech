@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { MappingService } from '../../services/mapping.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './pdf-config.html',
   styleUrl: './pdf-config.css'
 })
-export class PdfConfig implements OnInit {
+export class PdfConfig implements OnInit, OnChanges {
   // Form data
   @Input() currentPage: number = 1;
   @Input() promptText: string = 'Extract Income Tax ID Number';
@@ -42,53 +42,47 @@ export class PdfConfig implements OnInit {
   // Store last extracted value
   lastExtracted?: { field?: string; value?: string };
 
-  // List of fields that belong to a table
-  private tableFields = [
-    'salesOrder',
-    'noOfPackages',
-    'descriptionOfGoods',
-    'quantity',
-    'unit',
-    'grossWeight',
-    'amount'
-  ];
-
   constructor(private mappingService: MappingService) {}
 
   ngOnInit(): void {
     this.loadJsonData();
   }
 
-  async loadJsonData() {
-    const sampleJson = await this.mappingService.loadSampleJson();
-    if (!sampleJson) return;
-
-    const headers = [];
-    const tables = [];
-
-    for (const [key, value] of Object.entries(sampleJson)) {
-      if (Array.isArray(value) && value.length > 0 && value[0]?.type === 'table') {
-        // This is a table
-        const tableStructure = value[0];
-        const rows = Object.entries(tableStructure)
-          .filter(([fieldKey]) => fieldKey !== 'type')
-          .map(([fieldKey, fieldValue]) => ({ key: fieldKey, value: fieldValue }));
-        tables.push({ name: `${key} table`, rows, expanded: false });
-      } else if (
-        typeof value === 'object' &&
-        value !== null &&
-        !Array.isArray(value) &&
-        (value as any).type === 'header'
-      ) {
-        // This is a header
-          const fields = Object.entries(value as object)
-            .filter(([fieldKey]) => fieldKey !== 'type' && fieldKey !== 'page')
-            .map(([fieldKey, fieldValue]) => ({ key: fieldKey, value: fieldValue }));
-        headers.push({ name: key, fields, expanded: false });
-      }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentPage'] && !changes['currentPage'].firstChange) {
+      this.loadJsonData();
     }
-    this.headers = headers;
-    this.tables = tables;
+  }
+
+  async loadJsonData() {
+     const sampleJson = await this.mappingService.loadSampleJsonForPage(this.currentPage);
+     if (!sampleJson) {
+       this.headers = [];
+       this.tables = [];
+       return;
+     }
+ 
+     const headers: { name: string; fields: { key: string; value: any }[]; expanded: boolean }[] = [];
+     const tables: { name: string; rows: { key: string; value: any }[]; expanded: boolean }[] = [];
+ 
+     // Unified logic for all sample JSON files.
+     // Only the 'Header' key from the JSON is treated as a header section.
+     // All other top-level keys are treated as table sections.
+     for (const [key, value] of Object.entries(sampleJson)) {
+       if (Array.isArray(value) && value.length > 0) {
+         const dataObject = value[0];
+         if (key === 'Header') {
+           const fields = Object.entries(dataObject as object).map(([fieldKey, fieldValue]) => ({ key: fieldKey, value: fieldValue }));
+           headers.push({ name: key, fields, expanded: false });
+         } else {
+           const rows = Object.entries(dataObject as object).map(([fieldKey, fieldValue]) => ({ key: fieldKey, value: fieldValue }));
+           tables.push({ name: `${key} table`, rows, expanded: false });
+         }
+       }
+     }
+ 
+     this.headers = headers;
+     this.tables = tables;
   }
 
   toggleHeader(header: any) {
@@ -127,34 +121,6 @@ export class PdfConfig implements OnInit {
     const normalizedPrompt = this.promptText.toLowerCase().trim();
     const fileName = `json/file${this.currentPage}`;
 
-    // Special case for showing all table fields
-    if (normalizedPrompt === 'items table') {
-      // Let the parent component know to clear existing highlights
-      this.highlightRequested.emit({ clearAll: true });
-
-      for (const field of this.tableFields) {
-        // Use a more specific prompt for each field to help the mapping service
-        const fieldPrompt = `items table ${field}`;
-        const result = await this.mappingService.extractFieldFromPrompt(
-          fieldPrompt,
-          fileName,
-          this.currentPage
-        );
-
-        if (result) {
-          this.highlightRequested.emit({
-            pageNo: this.currentPage,
-            key: result.field,
-            labelText: result.key,
-            value: result.value,
-            labelBox: result.coords,
-            valueBox: result.valueCoords
-          });
-        }
-      }
-      return; // End of special handling
-    }
-
     // Try extracting from the document first
     const result = await this.mappingService.extractFieldFromPrompt(
       this.promptText,
@@ -163,14 +129,29 @@ export class PdfConfig implements OnInit {
     );
 
     if (result) {
-      // If the extracted field is a table field, update its value in the UI
-      const tableToUpdate = this.tables.find(table => 
-        table.rows.some(row => row.key === result.field)
-      );
-      if (tableToUpdate) {
-        const rowToUpdate = tableToUpdate.rows.find(row => row.key === result.field);
+      // When a value is extracted, find the corresponding field in the UI
+      // (headers or tables) and autofill it.
+      const fieldToUpdate = result.field.toLowerCase();
+      let fieldUpdated = false;
+
+      // Search in tables first
+      for (const table of this.tables) {
+        const rowToUpdate = table.rows.find(row => row.key.toLowerCase() === fieldToUpdate);
         if (rowToUpdate) {
           rowToUpdate.value = result.value;
+          fieldUpdated = true;
+          break;
+        }
+      }
+
+      // If not found in tables, search in headers
+      if (!fieldUpdated) {
+        for (const header of this.headers) {
+          const fieldToUpdateInHeader = header.fields.find(field => field.key.toLowerCase() === fieldToUpdate);
+          if (fieldToUpdateInHeader) {
+            fieldToUpdateInHeader.value = result.value;
+            break;
+          }
         }
       }
 
@@ -180,15 +161,10 @@ export class PdfConfig implements OnInit {
       this.displayName = result.field || this.displayName;
       this.instruction = `Extract ${this.fieldName}`;
 
-      if (this.tableFields.includes(result.field)) {
-        this.fieldType = 'Table';
-        this.tableName = tableToUpdate ? tableToUpdate.name.replace(' table', '') : 'items';
-        this.category = 'Table Details';
-      } else {
-        this.fieldType = 'Header';
-        this.tableName = '';
-        this.category = 'Header Details';
-      }
+      this.fieldType = 'Header';
+      this.tableName = '';
+      this.category = 'Header Details';
+
       this.lastExtracted = { field: this.displayName, value: result.value };
       this.onFieldChange();
 
