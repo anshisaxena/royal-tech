@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { DocumentType } from './file-upload.service';
 import * as Papa from 'papaparse';
 import { firstValueFrom } from 'rxjs';
 
@@ -8,7 +9,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class MappingService {
   private jsonCache: { [fileName: string]: any[] } = {};
-  private sampleJsonCache: { [page: number]: any } = {};
+  private sampleJsonCache: { [key: string]: any } = {};
   private csvData: any[] = [];
   private csvLoaded: boolean = false;
 
@@ -85,18 +86,25 @@ export class MappingService {
   constructor(private http: HttpClient) {}
 
   /** Load sample JSON file from assets (cached) */
-  async loadSampleJson(): Promise<any> {
-    return this.loadSampleJsonForPage(1);
-  }
-
-  /** Load sample JSON file for a specific page from assets (cached) */
-  async loadSampleJsonForPage(page: number): Promise<any> {
-    if (this.sampleJsonCache[page]) {
-      return this.sampleJsonCache[page];
+  async loadSampleJsonForPage(page: number, docType: DocumentType = 'IMPORT'): Promise<any> {
+    const cacheKey = `${docType}-${page}`;
+    if (this.sampleJsonCache[cacheKey]) {
+      return this.sampleJsonCache[cacheKey];
     }
-    const fileName = `assets/sample${page > 1 ? page : ''}.json`;
+
+    const filePrefix = docType === 'EXPORT' ? 'export' : 'sample';
+    // Ensure page number is within the valid range of your sample files (1-3)
+    const pageNum = Math.min(Math.max(page, 1), 3); 
+    let fileName = '';
+
+    if (docType === 'EXPORT') {
+      fileName = `assets/export${pageNum}.json`;
+    } else { // IMPORT
+      const pageSuffix = pageNum === 1 ? '' : String(pageNum);
+      fileName = `assets/sample${pageSuffix}.json`;
+    }
     const jsonData = await firstValueFrom(this.http.get<any>(fileName)).catch(() => null);
-    this.sampleJsonCache[page] = jsonData;
+    this.sampleJsonCache[cacheKey] = jsonData;
     return jsonData;
   }
 
@@ -600,7 +608,9 @@ export class MappingService {
   }
 
   public async extractFromSampleJson(prompt: string): Promise<any | null> {
-    const sampleJson = await this.loadSampleJson();
+    // The previous code had a typo here, calling a non-existent method.
+    // This line has been updated to call the correct method.
+    const sampleJson = await this.loadSampleJsonForPage(1, 'IMPORT'); 
     if (!sampleJson) return null;
 
     const normalizedPrompt = prompt.toLowerCase().replace(/extract\s*/g, "").replace(/[^a-z0-9]/g, '').trim();

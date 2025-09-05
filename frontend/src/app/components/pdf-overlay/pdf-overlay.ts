@@ -5,6 +5,7 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { MappingService } from '../../services/mapping.service';
 import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 import Tesseract from 'tesseract.js';
+import { DocumentType } from '../../services/file-upload.service';
 import { CsvService, CsvRow } from '../../services/csv.service';
 
 @Component({
@@ -25,6 +26,7 @@ export class PdfOverlayComponent implements OnInit {
   @Input() originalData: any;
   @Input() jsonData: any = {};
   @Input() currentPage: number = 1;
+  @Input() documentType: DocumentType | '' = 'IMPORT';
   @Input() highlights: Array<{ pageNo: number; key: string; labelText?: string; value: string; labelBox?: { left: number; top: number; right: number; bottom: number }; valueBox?: { left: number; top: number; right: number; bottom: number } }> = [];
   @Input() showHighlights: boolean = true;
   @Output() pageChanged = new EventEmitter<number>();
@@ -195,8 +197,11 @@ export class PdfOverlayComponent implements OnInit {
       // Persist the selection box for visual display
       this.drawnBoxes.push({ pageNo, ...selBox });
 
-      const csvFileName = `image${pageNo}`;
-      const jsonFileName = `file${pageNo}`;
+      const csvFilePrefix = this.documentType === 'EXPORT' ? 'export' : 'image';
+      const csvFileName = `${csvFilePrefix}${pageNo}`;
+
+      const jsonFilePrefix = this.documentType === 'EXPORT' ? 'json/export' : 'json/file';
+      const jsonFileName = `${jsonFilePrefix}${pageNo}`;
 
       // Load CSV and find intersections
       if (!this.csvTextCache.has(pageNo)) {
@@ -221,7 +226,7 @@ export class PdfOverlayComponent implements OnInit {
       let words: any[] = [];
       let labelText: string | undefined;
       try {
-        words = await this.mappingService.loadJson(`json/${jsonFileName}`);
+        words = await this.mappingService.loadJson(jsonFileName);
         const jsonPage = pageNo - 1;
         // Find all words on this page that overlap the selection box
         const matched = words.filter((w: any) =>

@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { MappingService } from '../../services/mapping.service';
 import { CommonModule } from '@angular/common';
+import { DocumentType } from '../../services/file-upload.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -12,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 export class PdfConfig implements OnInit, OnChanges {
   // Form data
   @Input() currentPage: number = 1;
+  @Input() documentType: DocumentType | '' = 'IMPORT';
   @Input() promptText: string = 'Extract Income Tax ID Number';
   @Input() fieldName: string = 'Title';
   @Input() fieldType: string = '';
@@ -49,13 +51,18 @@ export class PdfConfig implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['currentPage'] && !changes['currentPage'].firstChange) {
+    if (
+      (changes['currentPage'] && !changes['currentPage'].firstChange) ||
+      (changes['documentType'] && !changes['documentType'].firstChange)
+    ) {
       this.loadJsonData();
     }
   }
 
   async loadJsonData() {
-     const sampleJson = await this.mappingService.loadSampleJsonForPage(this.currentPage);
+     const sampleJson = await this.mappingService.loadSampleJsonForPage(
+       this.currentPage, this.documentType as DocumentType
+      );
      if (!sampleJson) {
        this.headers = [];
        this.tables = [];
@@ -119,7 +126,8 @@ export class PdfConfig implements OnInit, OnChanges {
     if (!this.promptText) return;
 
     const normalizedPrompt = this.promptText.toLowerCase().trim();
-    const fileName = `json/file${this.currentPage}`;
+    const filePrefix = this.documentType === 'EXPORT' ? 'json/export' : 'json/file';
+    const fileName = `${filePrefix}${this.currentPage}`;
 
     // Try extracting from the document first
     const result = await this.mappingService.extractFieldFromPrompt(
