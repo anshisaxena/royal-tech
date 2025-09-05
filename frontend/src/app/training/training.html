@@ -54,6 +54,7 @@
       <!-- Config Section -->
       <div class="config-section">
         <app-pdf-config
+          [documentType]="documentName"
           [currentPage]="currentPageForConfig"
           (promptChange)="handlePromptChange($event)"
           (fieldConfigChange)="handleFieldConfigChange($event)"

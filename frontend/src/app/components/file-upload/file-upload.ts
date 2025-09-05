@@ -124,7 +124,14 @@ export class FileUploadComponent {
   // ✅ Use service to set all files
   onContinue() {
     if (this.canContinue) {
-      this.fileService.setFiles(this.uploadedFiles.map(f => f.file));
+      this.fileService.setFiles(this.uploadedFiles.map(f => f.file), 'IMPORT');
+      this.router.navigate(['/training']);
+    }
+  }
+
+  onExport() {
+    if (this.canContinue) {
+      this.fileService.setFiles(this.uploadedFiles.map(f => f.file), 'EXPORT');
       this.router.navigate(['/training']);
     }
   }

@@ -60,6 +60,11 @@
   <!-- Actions -->
   <div class="actions">
     <button class="cancel-btn" (click)="onCancel()">Cancel</button>
-    <button class="continue-btn" [disabled]="!canContinue" (click)="onContinue()">Continue</button>
+    <button class="continue-btn" [disabled]="!canContinue" (click)="onContinue()">
+      Import
+    </button>
+    <button class="export-btn" [disabled]="!canContinue" (click)="onExport()">
+      Export
+    </button>
   </div>
 </div>

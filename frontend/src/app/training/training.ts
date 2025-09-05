@@ -3,7 +3,7 @@ import { NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Header } from '../components/header/header';
 import { ActionButtons } from '../components/action-buttons/action-buttons';
-import { FileUploadService } from '../services/file-upload.service';
+import { FileUploadService, DocumentType } from '../services/file-upload.service';
 import { PdfOverlayComponent } from '../components/pdf-overlay/pdf-overlay';
 import { PdfConfig } from '../components/pdf-config/pdf-config';
 
@@ -23,7 +23,7 @@ import { PdfConfig } from '../components/pdf-config/pdf-config';
   styleUrls: ['./training.css']
 })
 export class Training implements OnInit, OnDestroy {
-  documentName: string = 'IMPORT';
+  documentName: DocumentType | '' = '';
   uploadedFiles: File[] = [];
   fileType: 'pdf' | 'image' | null = null;
   fileURLs: Map<File, string> = new Map();
@@ -56,6 +56,7 @@ export class Training implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.uploadedFiles = this.fileService.getFiles() || [];
+    this.documentName = this.fileService.getDocumentType();
     this.updateFileContext();
   }
 
