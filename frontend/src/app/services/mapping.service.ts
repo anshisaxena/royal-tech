@@ -412,12 +412,12 @@ export class MappingService {
     let parsedKey = candidate.text;
     let parsedValue = "";
     let valueCoords: { left: number; top: number; right: number; bottom: number } | undefined;
-    let labelCoords = {
-        left: +candidate.left,
-        top: +candidate.top,
-        right: +candidate.right,
-        bottom: +candidate.bottom
-    };
+    const labelCoords = {
+      left: +candidate.left,
+      top: +candidate.top,
+      right: +candidate.right,
+      bottom: +candidate.bottom
+  };
 
     console.log('Candidate text:', candidate.text);
 
@@ -434,17 +434,16 @@ export class MappingService {
         const totalWidth = +candidate.right - +candidate.left;
         const totalLength = candidate.text.length;
         if (totalLength > 0) {
-            const charWidth = totalWidth / totalLength;
-            const valueStartIndex = candidate.text.toLowerCase().indexOf(parsedValue.toLowerCase());
-            const keyEndIndex = candidate.text.toLowerCase().indexOf(parsedKey.toLowerCase()) + parsedKey.length;
+          const charWidth = totalWidth / totalLength;
+          const valueStartIndex = candidate.text.toLowerCase().indexOf(parsedValue.toLowerCase());
+          const keyEndIndex = candidate.text.toLowerCase().indexOf(parsedKey.toLowerCase()) + parsedKey.length;
 
-            if (valueStartIndex > -1 && keyEndIndex > -1) {
-                const keyRight = +candidate.left + (keyEndIndex * charWidth);
-                const valueLeft = +candidate.left + (valueStartIndex * charWidth);
+          if (valueStartIndex > -1 && keyEndIndex > -1) {
+            const keyRight = +candidate.left + (keyEndIndex * charWidth);
+            const valueLeft = +candidate.left + (valueStartIndex * charWidth);
 
-                labelCoords.right = keyRight;
-                valueCoords = {
-                    left: valueLeft,
+            labelCoords.right = keyRight;
+            valueCoords = { left: valueLeft,
                     top: +candidate.top,
                     right: +candidate.right,
                     bottom: +candidate.bottom
